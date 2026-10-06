@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="光学系選定">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#f4f6f9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#11161d" media="(prefers-color-scheme: dark)">
+<title>光学系選定</title>
+</head>
+<body>
+<style>
+:root{--bg:#f4f6f9;--card:#fff;--ink:#1f2a37;--muted:#6b7686;--line:#dfe4ec;--navy:#1f3864;--accent:#2459a8;--in:#eaf1fb;--inedge:#9db7dc;
+  --okb:#e7f4ec;--okf:#1e7b4d;--wab:#fdf3df;--waf:#9a6300;--ngb:#fceae8;--ngf:#b3261e;--nab:#eceff4;--naf:#6b7686;--shadow:0 1px 2px rgba(20,35,60,.06)}
+@media (prefers-color-scheme:dark){:root{--bg:#11161d;--card:#1a212b;--ink:#e6ebf2;--muted:#94a0b2;--line:#2b3543;--navy:#a9c4f0;--accent:#7fb0f5;--in:#1f2c40;--inedge:#3d5578;
+  --okb:#173a29;--okf:#7fd6a5;--wab:#3d3014;--waf:#f0c264;--ngb:#40201d;--ngf:#f29b93;--nab:#252e3a;--naf:#94a0b2;--shadow:none}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Hiragino Sans","Yu Gothic UI",Meiryo,sans-serif;font-variant-numeric:tabular-nums;overflow-x:hidden}
+body.lock{overflow:hidden}
+button{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent;cursor:pointer}
+.wrap{max-width:560px;margin:0 auto}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top,0px) + 10px) 16px 8px;border-bottom:1px solid var(--line)}
+.top h1{margin:0;font-size:18px;color:var(--navy);letter-spacing:.02em}
+.pair{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;padding:0;text-align:left}
+.pair .names{flex:1;min-width:0;font-size:13px;line-height:1.35}
+.pair .names b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pair .names span{color:var(--muted);font-size:11px;margin-right:6px}
+main{padding:12px 16px calc(84px + env(safe-area-inset-bottom,0px))}
+.tab{display:none}.tab.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.card h2{margin:0 0 10px;font-size:13px;color:var(--navy);letter-spacing:.04em;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.lead{color:var(--muted);font-size:12.5px;margin:0 2px 10px}
+.note{color:var(--muted);font-size:12px;margin:8px 0 0}
+.dev{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--in);border:1px solid var(--inedge);border-radius:11px;padding:10px 12px;margin-top:8px}
+.dev:first-of-type{margin-top:0}
+.dev .k{font-size:11px;color:var(--muted);width:44px;flex:none}
+.dev .v{flex:1;min-width:0}
+.dev .v b{display:block;font-size:16px;overflow-wrap:anywhere}
+.dev .v small{display:block;color:var(--muted);font-size:12px}
+.dev .ch{color:var(--accent);font-size:20px;flex:none}
+.dev.empty .v b{color:var(--ngf)}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:3px}
+.field .box{display:flex;align-items:center;background:var(--in);border:1px solid var(--inedge);border-radius:10px;padding:0 10px}
+.field input{flex:1;min-width:0;width:100%;border:0;background:none;color:var(--ink);font:600 17px/1 inherit;font-variant-numeric:tabular-nums;padding:11px 0;text-align:right;outline:none}
+.field .u{color:var(--muted);font-size:12px;margin-left:6px;flex:none}
+.field .box:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 25%,transparent)}
+.bd{display:inline-block;font-weight:700;font-size:13px;padding:3px 9px;border-radius:999px;white-space:nowrap}
+.bd.ok{background:var(--okb);color:var(--okf)}.bd.warn{background:var(--wab);color:var(--waf)}.bd.ng{background:var(--ngb);color:var(--ngf)}.bd.na{background:var(--nab);color:var(--naf)}
+.jrow{display:flex;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line)}
+.jrow:first-of-type{border-top:0;padding-top:2px}
+.jrow .n{width:94px;flex:none;font-size:13.5px}
+.jrow .m{flex:1;min-width:0;text-align:right;font-size:12.5px;color:var(--muted)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.btn{border:1px solid var(--accent);background:none;color:var(--accent);border-radius:10px;padding:9px 12px;font-weight:600;font-size:13.5px}
+.btn.fill{background:var(--accent);color:var(--card)}
+.hero{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 8px;text-align:center;box-shadow:var(--shadow);min-width:0}
+.stat .l{display:block;font-size:11px;color:var(--muted)}
+.stat b{display:block;font-size:21px;line-height:1.3;color:var(--navy);overflow-wrap:anywhere}
+.stat .u{font-size:11px;color:var(--muted)}
+.kv{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-top:1px solid var(--line);font-size:14px}
+.kv:first-of-type{border-top:0}
+.kv .k{color:var(--muted);flex:none}
+.kv .v{text-align:right;min-width:0;overflow-wrap:anywhere}
+.kv .v small{color:var(--muted);margin-left:4px}
+details.card>summary{list-style:none;font-size:13px;color:var(--navy);font-weight:700;letter-spacing:.04em;display:flex;justify-content:space-between}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary:after{content:"＋";color:var(--muted)}details.card[open]>summary:after{content:"－"}
+details.card[open]>summary{margin-bottom:8px}
+.seg{display:flex;background:var(--nab);border-radius:11px;padding:3px;margin-bottom:12px}
+.seg button{flex:1;border:0;background:none;border-radius:9px;padding:8px 4px;font-weight:600;font-size:13.5px;color:var(--muted)}
+.seg button.on{background:var(--card);color:var(--navy);box-shadow:var(--shadow)}
+.diag{background:var(--in);border-left:4px solid var(--accent);border-radius:8px;padding:10px 12px;font-weight:600;font-size:14px;margin-bottom:10px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:8px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--ink);white-space:nowrap}
+.chip.on{background:var(--navy);border-color:var(--navy);color:var(--card)}
+.item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:8px;box-shadow:var(--shadow)}
+.item.cur{border-color:var(--accent)}
+.ih{display:flex;align-items:center;gap:8px}
+.ih .mdl{flex:1;min-width:0;font-size:15.5px;overflow-wrap:anywhere}
+.mini{flex:none;border:1px solid var(--accent);background:var(--accent);color:var(--card);border-radius:8px;padding:6px 12px;font-weight:700;font-size:13px}
+.tag{flex:none;font-size:11.5px;color:var(--accent);border:1px solid var(--accent);border-radius:6px;padding:2px 6px}
+.isub{font-size:12.5px;color:var(--muted);margin-top:4px}
+.isub b{color:var(--ink)}
+.isub.bad{color:var(--ngf)}
+.vars{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px;font-size:12px;color:var(--muted)}
+.vchip{border:1px solid var(--line);background:none;border-radius:8px;padding:5px 9px;font-size:12.5px;color:var(--accent)}
+.vchip.on{border-color:var(--accent);font-weight:700}
+.more{display:block;width:100%;border:1px dashed var(--line);background:none;border-radius:10px;padding:10px;color:var(--accent);font-weight:600;margin-bottom:8px}
+.empty{color:var(--muted);text-align:center;padding:18px 0;font-size:13.5px}
+.row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-top:1px solid var(--line);padding:10px 2px}
+.row:first-child{border-top:0}
+.row .rv{flex:1;min-width:0}
+.row .rv b{display:block;font-size:15px;overflow-wrap:anywhere}
+.row .rv small{display:block;color:var(--muted);font-size:12px}
+.row .dot{flex:none;width:10px;height:10px;border-radius:50%;background:var(--nab)}
+.row .dot.ok{background:var(--okf)}.row .dot.warn{background:var(--waf)}.row .dot.ng{background:var(--ngf)}
+.row.cur .rv b{color:var(--accent)}
+.search{display:flex;align-items:center;background:var(--in);border:1px solid var(--inedge);border-radius:10px;padding:0 12px;margin-bottom:8px}
+.search input{flex:1;min-width:0;border:0;background:none;color:var(--ink);font:16px/1 inherit;padding:11px 0;outline:none}
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs .in{max-width:560px;margin:0 auto;display:flex}
+.tabs button{flex:1;border:0;background:none;padding:7px 0 6px;color:var(--muted);font-size:10.5px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.tabs button svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs button.on{color:var(--accent);font-weight:700}
+.sheet{position:fixed;inset:0;z-index:20;display:none}
+.sheet.on{display:block}
+.sheet .dim{position:absolute;inset:0;background:rgba(0,0,0,.45)}
+.sheet .panel{position:absolute;left:0;right:0;bottom:0;max-width:560px;margin:0 auto;height:88%;background:var(--bg);border-radius:18px 18px 0 0;display:flex;flex-direction:column;padding:12px 16px 0}
+.sheet .sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sheet .sh b{font-size:16px;color:var(--navy)}
+.sheet .x{border:0;background:var(--nab);border-radius:50%;width:32px;height:32px;font-size:16px;color:var(--muted)}
+.sheet .body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.sheet .list{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:0 12px}
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:var(--card);padding:9px 16px;border-radius:999px;font-size:13.5px;font-weight:600;z-index:30;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90%;text-align:center}
+.toast.on{opacity:1}
+.fmt{display:grid;grid-template-columns:1fr 1fr;column-gap:18px}
+a{color:var(--accent)}
+</style>
+<div class="wrap">
+  <header class="top" id="top"></header>
+  <main>
+    <section class="tab" id="t-sel">
+      <div class="card"><h2>機器</h2><div id="sel-dev"></div></div>
+      <div class="card"><h2>条件</h2><div class="fields">
+        <div class="field"><label for="i-fov">視野幅（横）</label><div class="box"><input id="i-fov" data-k="fov" inputmode="decimal" autocomplete="off"><span class="u">mm</span></div></div>
+        <div class="field"><label for="i-res">目標分解能</label><div class="box"><input id="i-res" data-k="res" inputmode="decimal" autocomplete="off"><span class="u">mm/pix</span></div></div>
+        <div class="field"><label for="i-fno">F値</label><div class="box"><input id="i-fno" data-k="fno" inputmode="decimal" autocomplete="off"></div></div>
+        <div class="field"><label for="i-coc">許容錯乱円</label><div class="box"><input id="i-coc" data-k="coc" inputmode="decimal" autocomplete="off"><span class="u">画素分</span></div></div>
+        <div class="field"><label for="i-speed">搬送速度</label><div class="box"><input id="i-speed" data-k="speed" inputmode="decimal" autocomplete="off"><span class="u">m/min</span></div></div>
+      </div></div>
+      <div id="sel-out"></div>
+    </section>
+    <section class="tab" id="t-find">
+      <div class="seg" id="find-seg"><button data-act="findmode" data-m="lens">レンズを探す</button><button data-act="findmode" data-m="cam">カメラを探す</button></div>
+      <div id="find-out"></div>
+    </section>
+    <section class="tab" id="t-wd">
+      <p class="lead">装置の都合で取付距離（WD）が先に決まっているとき用。視野幅と目標分解能は「選定」の値を使います。</p>
+      <div class="card"><h2>機械側の条件</h2><div class="fields">
+        <div class="field"><label for="i-wdmin">WD 最小</label><div class="box"><input id="i-wdmin" data-k="wdMin" inputmode="decimal" autocomplete="off"><span class="u">mm</span></div></div>
+        <div class="field"><label for="i-wdmax">WD 最大</label><div class="box"><input id="i-wdmax" data-k="wdMax" inputmode="decimal" autocomplete="off"><span class="u">mm</span></div></div>
+      </div><p class="note">片方を空欄にすると、その側は制限なしで探します。</p></div>
+      <div id="wd-out"></div>
+    </section>
+    <section class="tab" id="t-cv">
+      <p class="lead">WD・視野幅・分解能は、どれか1つが決まれば残りも決まります。3つの入力は独立していて、互いに影響しません。</p>
+      <div id="cv-head"></div>
+      <div class="card"><h2>① WD を入れる → 視野幅</h2><div class="field"><label for="i-cvwd">WD</label><div class="box"><input id="i-cvwd" data-k="cvWd" inputmode="decimal" autocomplete="off"><span class="u">mm</span></div></div><div id="cv-a"></div></div>
+      <div class="card"><h2>② 視野幅を入れる → WD</h2><div class="field"><label for="i-cvfov">視野幅（横）</label><div class="box"><input id="i-cvfov" data-k="cvFov" inputmode="decimal" autocomplete="off"><span class="u">mm</span></div></div><div id="cv-b"></div></div>
+      <div class="card"><h2>③ 分解能を入れる → 視野幅・WD</h2><div class="field"><label for="i-cvres">分解能</label><div class="box"><input id="i-cvres" data-k="cvRes" inputmode="decimal" autocomplete="off"><span class="u">mm/pix</span></div></div><div id="cv-c"></div></div>
+      <p class="note">WDはレンズ主点から被写体まで。カタログの最短/最大WDはレンズ先端からのことが多く、その差（レンズ全長ぶん）は見ていません。取付は余裕を持たせてください。</p>
+    </section>
+    <section class="tab" id="t-db">
+      <div class="seg" id="db-seg"><button data-act="dbmode" data-m="cam">カメラ</button><button data-act="dbmode" data-m="lens">レンズ</button><button data-act="dbmode" data-m="etc">規格・設定</button></div>
+      <div id="db-out"></div>
+    </section>
+  </main>
+</div>
+<nav class="tabs"><div class="in" id="tabs">
+  <button data-act="tab" data-m="sel"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>選定</button>
+  <button data-act="tab" data-m="find"><svg viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2"/></svg>候補</button>
+  <button data-act="tab" data-m="wd"><svg viewBox="0 0 24 24"><path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4M4 12h3M17 12h3"/></svg>WDから</button>
+  <button data-act="tab" data-m="cv"><svg viewBox="0 0 24 24"><path d="M4 8h14l-3-3M20 16H6l3 3"/></svg>換算</button>
+  <button data-act="tab" data-m="db"><svg viewBox="0 0 24 24"><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3zM5 17a3 3 0 0 1 3-3h11M9 8h6"/></svg>台帳</button>
+</div></nav>
+<div class="sheet" id="sheet"><div class="dim" data-act="close"></div><div class="panel"><div class="sh"><b id="sheet-title"></b><button class="x" data-act="close" aria-label="閉じる">✕</button></div><div class="body" id="sheet-body"></div></div></div>
+<div class="toast" id="toast"></div>
+<script>
+const DATA = {"cams":[{"m":"a2A1920-160ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX392","w":1920,"h":1200,"px":3.45,"fmt":"1/2.3","diag":7.9,"shutter":"グローバル","fps":160,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a1920-160ucbas"},{"m":"a2A1920-160umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX392","w":1920,"h":1200,"px":3.45,"fmt":"1/2.3","diag":7.9,"shutter":"グローバル","fps":160,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a1920-160umbas"},{"m":"a2A1920-51gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX392","w":1920,"h":1200,"px":3.45,"fmt":"1/2.3","diag":7.9,"shutter":"グローバル","fps":51,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a1920-51gcbas"},{"m":"a2A1920-51gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX392","w":1920,"h":1200,"px":3.45,"fmt":"1/2.3","diag":7.9,"shutter":"グローバル","fps":51,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a1920-51gmbas"},{"m":"a2A2048-114ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX900","w":2064,"h":1552,"px":2.25,"fmt":"1/3.1","diag":5.81,"shutter":"グローバル","fps":114,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a2048-114ucbas"},{"m":"a2A2048-114umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX900","w":2064,"h":1552,"px":2.25,"fmt":"1/3.1","diag":5.81,"shutter":"グローバル","fps":114,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a2048-114umbas"},{"m":"a2A2048-37gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX900","w":2064,"h":1552,"px":2.25,"fmt":"1/3.1","diag":5.81,"shutter":"グローバル","fps":37,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a2048-37gcbas"},{"m":"a2A2048-37gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX900","w":2064,"h":1552,"px":2.25,"fmt":"1/3.1","diag":5.81,"shutter":"グローバル","fps":37,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a2048-37gmbas"},{"m":"a2A2440-98g5cBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX250","w":2448,"h":2048,"px":3.45,"fmt":"2/3","diag":11.1,"shutter":"グローバル","fps":98,"color":"カラー","mount":"C","iface":"5GigE","memo":"","url":"https://docs.baslerweb.com/a2a2440-98g5cbas"},{"m":"a2A2440-98g5mBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX250","w":2448,"h":2048,"px":3.45,"fmt":"2/3","diag":11.1,"shutter":"グローバル","fps":98,"color":"モノクロ","mount":"C","iface":"5GigE","memo":"","url":"https://docs.baslerweb.com/a2a2440-98g5mbas"},{"m":"a2A2448-23gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX547","w":2448,"h":2048,"px":2.74,"fmt":"1/1.8","diag":8.8,"shutter":"グローバル","fps":23,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a2448-23gcbas"},{"m":"a2A2448-23gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX547","w":2448,"h":2048,"px":2.74,"fmt":"1/1.8","diag":8.8,"shutter":"グローバル","fps":23,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a2448-23gmbas"},{"m":"a2A2448-75ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX547","w":2448,"h":2048,"px":2.74,"fmt":"1/1.8","diag":8.8,"shutter":"グローバル","fps":75,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a2448-75ucbas"},{"m":"a2A2448-75umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX547","w":2448,"h":2048,"px":2.74,"fmt":"1/1.8","diag":8.8,"shutter":"グローバル","fps":75,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a2448-75umbas"},{"m":"a2A2464-23gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"OmniVision OG05C","w":2448,"h":2048,"px":3.45,"fmt":"2/3","diag":11.09,"shutter":"グローバル","fps":23,"color":"カラー","mount":"C","iface":"GigE","memo":"型番の2464はフル解像度側の数字。既定解像度は2448×2048","url":"https://docs.baslerweb.com/a2a2464-23gcbas"},{"m":"a2A2464-23gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"OmniVision OG05C","w":2448,"h":2048,"px":3.45,"fmt":"2/3","diag":11.09,"shutter":"グローバル","fps":23,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番の2464はフル解像度側の数字。既定解像度は2448×2048","url":"https://docs.baslerweb.com/a2a2464-23gmbas"},{"m":"a2A2464-77ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"OmniVision OG05C","w":2448,"h":2048,"px":3.45,"fmt":"2/3","diag":11.09,"shutter":"グローバル","fps":77,"color":"カラー","mount":"C","iface":"USB3","memo":"型番の2464はフル解像度側の数字。既定解像度は2448×2048","url":"https://docs.baslerweb.com/a2a2464-77ucbas"},{"m":"a2A2464-77umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"OmniVision OG05C","w":2448,"h":2048,"px":3.45,"fmt":"2/3","diag":11.09,"shutter":"グローバル","fps":77,"color":"モノクロ","mount":"C","iface":"USB3","memo":"型番の2464はフル解像度側の数字。既定解像度は2448×2048","url":"https://docs.baslerweb.com/a2a2464-77umbas"},{"m":"a2A2590-22gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX334","w":2592,"h":1944,"px":2.0,"fmt":"1/2.8","diag":6.53,"shutter":"ローリング","fps":22,"color":"カラー","mount":"C","iface":"GigE","memo":"IMX334をROIモードで使用（a2A3840と同一センサ）","url":"https://docs.baslerweb.com/a2a2590-22gcbas"},{"m":"a2A2590-22gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX334","w":2592,"h":1944,"px":2.0,"fmt":"1/2.8","diag":6.53,"shutter":"ローリング","fps":22,"color":"モノクロ","mount":"C","iface":"GigE","memo":"IMX334をROIモードで使用（a2A3840と同一センサ）","url":"https://docs.baslerweb.com/a2a2590-22gmbas"},{"m":"a2A2590-60ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX334","w":2592,"h":1944,"px":2.0,"fmt":"1/2.8","diag":6.53,"shutter":"ローリング","fps":60,"color":"カラー","mount":"C","iface":"USB3","memo":"IMX334をROIモードで使用（a2A3840と同一センサ）","url":"https://docs.baslerweb.com/a2a2590-60ucbas"},{"m":"a2A2590-60umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX334","w":2592,"h":1944,"px":2.0,"fmt":"1/2.8","diag":6.53,"shutter":"ローリング","fps":60,"color":"モノクロ","mount":"C","iface":"USB3","memo":"IMX334をROIモードで使用（a2A3840と同一センサ）","url":"https://docs.baslerweb.com/a2a2590-60umbas"},{"m":"a2A2600-20gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2505","w":2600,"h":2128,"px":2.5,"fmt":"1/2","diag":8.45,"shutter":"グローバル","fps":20,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a2600-20gcbas"},{"m":"a2A2600-20gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2505","w":2600,"h":2128,"px":2.5,"fmt":"1/2","diag":8.45,"shutter":"グローバル","fps":20,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a2600-20gmbas"},{"m":"a2A2600-64ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2505","w":2600,"h":2128,"px":2.5,"fmt":"1/2","diag":8.45,"shutter":"グローバル","fps":64,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a2600-64ucbas"},{"m":"a2A2600-64umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2505","w":2600,"h":2128,"px":2.5,"fmt":"1/2","diag":8.45,"shutter":"グローバル","fps":64,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a2600-64umbas"},{"m":"a2A2840-14gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX546","w":2840,"h":2840,"px":2.74,"fmt":"2/3","diag":11.1,"shutter":"グローバル","fps":14,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a2840-14gcbas"},{"m":"a2A2840-14gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX546","w":2840,"h":2840,"px":2.74,"fmt":"2/3","diag":11.1,"shutter":"グローバル","fps":14,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a2840-14gmbas"},{"m":"a2A2840-48ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX546","w":2840,"h":2840,"px":2.74,"fmt":"2/3","diag":11.1,"shutter":"グローバル","fps":48,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a2840-48ucbas"},{"m":"a2A2840-48umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX546","w":2840,"h":2840,"px":2.74,"fmt":"2/3","diag":11.1,"shutter":"グローバル","fps":48,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a2840-48umbas"},{"m":"a2A3536-31ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX676","w":3536,"h":3536,"px":2.0,"fmt":"1/1.6","diag":10.02,"shutter":"ローリング","fps":31,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a3536-31ucbas"},{"m":"a2A3536-31umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX676","w":3536,"h":3536,"px":2.0,"fmt":"1/1.6","diag":10.02,"shutter":"ローリング","fps":31,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a3536-31umbas"},{"m":"a2A3536-9gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX676","w":3536,"h":3536,"px":2.0,"fmt":"1/1.6","diag":10.02,"shutter":"ローリング","fps":9,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a3536-9gcbas"},{"m":"a2A3536-9gcPRO","maker":"Basler","series":"ace 2 PRO","sensor":"Sony IMX676","w":3536,"h":3536,"px":2.0,"fmt":"1/1.6","diag":10.02,"shutter":"ローリング","fps":9,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a3536-9gcpro"},{"m":"a2A3536-9gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX676","w":3536,"h":3536,"px":2.0,"fmt":"1/1.6","diag":10.02,"shutter":"ローリング","fps":9,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a3536-9gmbas"},{"m":"a2A3536-9gmPRO","maker":"Basler","series":"ace 2 PRO","sensor":"Sony IMX676","w":3536,"h":3536,"px":2.0,"fmt":"1/1.6","diag":10.02,"shutter":"ローリング","fps":9,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a3536-9gmpro"},{"m":"a2A3840-13gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX334","w":3840,"h":2160,"px":2.0,"fmt":"1/1.8","diag":8.86,"shutter":"ローリング","fps":13,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a3840-13gcbas"},{"m":"a2A3840-13gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX334","w":3840,"h":2160,"px":2.0,"fmt":"1/1.8","diag":8.86,"shutter":"ローリング","fps":13,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a3840-13gmbas"},{"m":"a2A3840-45ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX334","w":3840,"h":2160,"px":2.0,"fmt":"1/1.8","diag":8.86,"shutter":"ローリング","fps":45,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a3840-45ucbas"},{"m":"a2A3840-45umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX334","w":3840,"h":2160,"px":2.0,"fmt":"1/1.8","diag":8.86,"shutter":"ローリング","fps":45,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a3840-45umbas"},{"m":"a2A4096-30ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX545","w":4096,"h":3000,"px":2.74,"fmt":"1/1.1","diag":14.0,"shutter":"グローバル","fps":30,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a4096-30ucbas"},{"m":"a2A4096-30umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX545","w":4096,"h":3000,"px":2.74,"fmt":"1/1.1","diag":14.0,"shutter":"グローバル","fps":30,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a4096-30umbas"},{"m":"a2A4096-9gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX545","w":4096,"h":3000,"px":2.74,"fmt":"1/1.1","diag":14.0,"shutter":"グローバル","fps":9,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a4096-9gcbas"},{"m":"a2A4096-9gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX545","w":4096,"h":3000,"px":2.74,"fmt":"1/1.1","diag":14.0,"shutter":"グローバル","fps":9,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a4096-9gmbas"},{"m":"a2A4200-12gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2509","w":4200,"h":2128,"px":2.5,"fmt":"2/3","diag":11.81,"shutter":"グローバル","fps":12,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a4200-12gcbas"},{"m":"a2A4200-12gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2509","w":4200,"h":2128,"px":2.5,"fmt":"2/3","diag":11.81,"shutter":"グローバル","fps":12,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a4200-12gmbas"},{"m":"a2A4200-40ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2509","w":4200,"h":2128,"px":2.5,"fmt":"2/3","diag":11.81,"shutter":"グローバル","fps":40,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a4200-40ucbas"},{"m":"a2A4200-40umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2509","w":4200,"h":2128,"px":2.5,"fmt":"2/3","diag":11.81,"shutter":"グローバル","fps":40,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a4200-40umbas"},{"m":"a2A4504-18ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX541","w":4504,"h":4504,"px":2.74,"fmt":"1.1","diag":17.5,"shutter":"グローバル","fps":18,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a4504-18ucbas"},{"m":"a2A4504-18umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX541","w":4504,"h":4504,"px":2.74,"fmt":"1.1","diag":17.5,"shutter":"グローバル","fps":18,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a4504-18umbas"},{"m":"a2A4504-5gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX541","w":4504,"h":4504,"px":2.74,"fmt":"1.1","diag":17.5,"shutter":"グローバル","fps":5,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a4504-5gcbas"},{"m":"a2A4504-5gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX541","w":4504,"h":4504,"px":2.74,"fmt":"1.1","diag":17.5,"shutter":"グローバル","fps":5,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a4504-5gmbas"},{"m":"a2A4508-20ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2518","w":4508,"h":4096,"px":2.5,"fmt":"1","diag":15.22,"shutter":"グローバル","fps":20,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a4508-20ucbas"},{"m":"a2A4508-20umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2518","w":4508,"h":4096,"px":2.5,"fmt":"1","diag":15.22,"shutter":"グローバル","fps":20,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a4508-20umbas"},{"m":"a2A4508-6gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2518","w":4508,"h":4096,"px":2.5,"fmt":"1","diag":15.22,"shutter":"グローバル","fps":6,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a4508-6gcbas"},{"m":"a2A4508-6gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Gpixel GMAX2518","w":4508,"h":4096,"px":2.5,"fmt":"1","diag":15.22,"shutter":"グローバル","fps":6,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a4508-6gmbas"},{"m":"a2A5060-15ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"E2525A","w":5064,"h":5064,"px":2.5,"fmt":"1.1","diag":17.9,"shutter":"グローバル","fps":15,"color":"カラー","mount":"C","iface":"USB3","memo":"センサのメーカー名は公式に記載なし（Gpixel製とする資料はあるが未確認）","url":"https://docs.baslerweb.com/a2a5060-15ucbas"},{"m":"a2A5060-15umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"E2525A","w":5064,"h":5064,"px":2.5,"fmt":"1.1","diag":17.9,"shutter":"グローバル","fps":15,"color":"モノクロ","mount":"C","iface":"USB3","memo":"センサのメーカー名は公式に記載なし（Gpixel製とする資料はあるが未確認）","url":"https://docs.baslerweb.com/a2a5060-15umbas"},{"m":"a2A5060-4gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"E2525A","w":5064,"h":5064,"px":2.5,"fmt":"1.1","diag":17.9,"shutter":"グローバル","fps":4,"color":"カラー","mount":"C","iface":"GigE","memo":"センサのメーカー名は公式に記載なし（Gpixel製とする資料はあるが未確認）","url":"https://docs.baslerweb.com/a2a5060-4gcbas"},{"m":"a2A5060-4gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"E2525A","w":5064,"h":5064,"px":2.5,"fmt":"1.1","diag":17.9,"shutter":"グローバル","fps":4,"color":"モノクロ","mount":"C","iface":"GigE","memo":"センサのメーカー名は公式に記載なし（Gpixel製とする資料はあるが未確認）","url":"https://docs.baslerweb.com/a2a5060-4gmbas"},{"m":"a2A5320-23ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX542","w":5320,"h":3032,"px":2.74,"fmt":"1.1","diag":16.8,"shutter":"グローバル","fps":23,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a5320-23ucbas"},{"m":"a2A5320-23umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX542","w":5320,"h":3032,"px":2.74,"fmt":"1.1","diag":16.8,"shutter":"グローバル","fps":23,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a5320-23umbas"},{"m":"a2A5320-7gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX542","w":5320,"h":3032,"px":2.74,"fmt":"1.1","diag":16.8,"shutter":"グローバル","fps":7,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a5320-7gcbas"},{"m":"a2A5320-7gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX542","w":5320,"h":3032,"px":2.74,"fmt":"1.1","diag":16.8,"shutter":"グローバル","fps":7,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a5320-7gmbas"},{"m":"a2A5328-15ucBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX540","w":5328,"h":4608,"px":2.74,"fmt":"1.2","diag":19.3,"shutter":"グローバル","fps":15,"color":"カラー","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a5328-15ucbas"},{"m":"a2A5328-15umBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX540","w":5328,"h":4608,"px":2.74,"fmt":"1.2","diag":19.3,"shutter":"グローバル","fps":15,"color":"モノクロ","mount":"C","iface":"USB3","memo":"","url":"https://docs.baslerweb.com/a2a5328-15umbas"},{"m":"a2A5328-4gcBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX540","w":5328,"h":4608,"px":2.74,"fmt":"1.2","diag":19.3,"shutter":"グローバル","fps":4,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a5328-4gcbas"},{"m":"a2A5328-4gmBAS","maker":"Basler","series":"ace 2 BAS","sensor":"Sony IMX540","w":5328,"h":4608,"px":2.74,"fmt":"1.2","diag":19.3,"shutter":"グローバル","fps":4,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/a2a5328-4gmbas"},{"m":"acA1280-60gc","maker":"Basler","series":"ace","sensor":"e2v EV76C560","w":1280,"h":1024,"px":5.3,"fmt":"1/1.8","diag":8.7,"shutter":"ローリング","fps":60,"color":"カラー","mount":"C","iface":"GigE","memo":"ローリングシャッター固定","url":"https://docs.baslerweb.com/aca1280-60gc"},{"m":"acA1280-60gm","maker":"Basler","series":"ace","sensor":"e2v EV76C560","w":1282,"h":1026,"px":5.3,"fmt":"1/1.8","diag":8.7,"shutter":"ローリング","fps":60,"color":"モノクロ","mount":"C","iface":"GigE","memo":"ローリングシャッター固定","url":"https://docs.baslerweb.com/aca1280-60gm"},{"m":"acA1300-60gc","maker":"Basler","series":"ace","sensor":"e2v EV76C560","w":1280,"h":1024,"px":5.3,"fmt":"1/1.8","diag":8.7,"shutter":"グローバル/ローリング切替","fps":60,"color":"カラー","mount":"C","iface":"GigE","memo":"acA1280-60と同一センサ。シャッター方式のみ切替可","url":"https://docs.baslerweb.com/aca1300-60gc"},{"m":"acA1300-60gm","maker":"Basler","series":"ace","sensor":"e2v EV76C560","w":1282,"h":1026,"px":5.3,"fmt":"1/1.8","diag":8.7,"shutter":"グローバル/ローリング切替","fps":60,"color":"モノクロ","mount":"C","iface":"GigE","memo":"acA1280-60と同一センサ。シャッター方式のみ切替可","url":"https://docs.baslerweb.com/aca1300-60gm"},{"m":"acA1440-73gc","maker":"Basler","series":"ace","sensor":"Sony IMX273","w":1440,"h":1080,"px":3.45,"fmt":"1/2.9","diag":6.3,"shutter":"グローバル","fps":73,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/aca1440-73gc"},{"m":"acA1440-73gm","maker":"Basler","series":"ace","sensor":"Sony IMX273","w":1440,"h":1080,"px":3.45,"fmt":"1/2.9","diag":6.3,"shutter":"グローバル","fps":73,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/aca1440-73gm"},{"m":"acA1600-60gc","maker":"Basler","series":"ace","sensor":"e2v EV76C570","w":1600,"h":1200,"px":4.5,"fmt":"1/1.8","diag":9.0,"shutter":"グローバル/ローリング切替","fps":60,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/aca1600-60gc"},{"m":"acA1600-60gm","maker":"Basler","series":"ace","sensor":"e2v EV76C570","w":1602,"h":1202,"px":4.5,"fmt":"1/1.8","diag":9.0,"shutter":"グローバル/ローリング切替","fps":60,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/aca1600-60gm"},{"m":"acA1920-40gc","maker":"Basler","series":"ace","sensor":"Sony IMX249","w":1920,"h":1200,"px":5.86,"fmt":"1/1.2","diag":13.3,"shutter":"グローバル","fps":42,"color":"カラー","mount":"C","iface":"GigE","memo":"型番公称40fps","url":"https://docs.baslerweb.com/aca1920-40gc"},{"m":"acA1920-40gm","maker":"Basler","series":"ace","sensor":"Sony IMX249","w":1920,"h":1200,"px":5.86,"fmt":"1/1.2","diag":13.3,"shutter":"グローバル","fps":42,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番公称40fps","url":"https://docs.baslerweb.com/aca1920-40gm"},{"m":"acA2000-50gc","maker":"Basler","series":"ace","sensor":"ams CMV2000","w":2046,"h":1086,"px":5.5,"fmt":"2/3","diag":12.75,"shutter":"グローバル","fps":50,"color":"カラー","mount":"C","iface":"GigE","memo":"対角12.75mmだがBasler公式の型表記は2/3型","url":"https://docs.baslerweb.com/aca2000-50gc"},{"m":"acA2000-50gm","maker":"Basler","series":"ace","sensor":"ams CMV2000","w":2048,"h":1088,"px":5.5,"fmt":"2/3","diag":12.75,"shutter":"グローバル","fps":50,"color":"モノクロ","mount":"C","iface":"GigE","memo":"対角12.75mmだがBasler公式の型表記は2/3型","url":"https://docs.baslerweb.com/aca2000-50gm"},{"m":"acA2040-35gc","maker":"Basler","series":"ace","sensor":"Sony IMX265","w":2048,"h":1536,"px":3.45,"fmt":"1/1.8","diag":8.9,"shutter":"グローバル","fps":36,"color":"カラー","mount":"C","iface":"GigE","memo":"型番公称35fps","url":"https://docs.baslerweb.com/aca2040-35gc"},{"m":"acA2040-35gm","maker":"Basler","series":"ace","sensor":"Sony IMX265","w":2048,"h":1536,"px":3.45,"fmt":"1/1.8","diag":8.9,"shutter":"グローバル","fps":36,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番公称35fps","url":"https://docs.baslerweb.com/aca2040-35gm"},{"m":"acA2440-20gc","maker":"Basler","series":"ace","sensor":"Sony IMX264","w":2448,"h":2048,"px":3.45,"fmt":"2/3","diag":11.1,"shutter":"グローバル","fps":22.7,"color":"カラー","mount":"C","iface":"GigE","memo":"型番公称20fps","url":"https://docs.baslerweb.com/aca2440-20gc"},{"m":"acA2440-20gm","maker":"Basler","series":"ace","sensor":"Sony IMX264","w":2448,"h":2048,"px":3.45,"fmt":"2/3","diag":11.1,"shutter":"グローバル","fps":22.7,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番公称20fps","url":"https://docs.baslerweb.com/aca2440-20gm"},{"m":"acA2500-14gc","maker":"Basler","series":"ace","sensor":"onsemi MT9P031","w":2592,"h":1942,"px":2.2,"fmt":"1/2.5","diag":7.13,"shutter":"ローリング","fps":14.6,"color":"カラー","mount":"C","iface":"GigE","memo":"型番公称14fps。画素数はBasler公称の2592×1942","url":"https://docs.baslerweb.com/aca2500-14gc"},{"m":"acA2500-14gm","maker":"Basler","series":"ace","sensor":"onsemi MT9P031","w":2592,"h":1942,"px":2.2,"fmt":"1/2.5","diag":7.13,"shutter":"ローリング","fps":14.6,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番公称14fps。画素数はBasler公称の2592×1942","url":"https://docs.baslerweb.com/aca2500-14gm"},{"m":"acA3088-16gc","maker":"Basler","series":"ace","sensor":"Sony IMX178","w":3088,"h":2064,"px":2.4,"fmt":"1/1.8","diag":8.92,"shutter":"ローリング","fps":16.9,"color":"カラー","mount":"C","iface":"GigE","memo":"型番公称16fps","url":"https://docs.baslerweb.com/aca3088-16gc"},{"m":"acA3088-16gm","maker":"Basler","series":"ace","sensor":"Sony IMX178","w":3088,"h":2064,"px":2.4,"fmt":"1/1.8","diag":8.92,"shutter":"ローリング","fps":16.9,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番公称16fps","url":"https://docs.baslerweb.com/aca3088-16gm"},{"m":"acA3800-10gc","maker":"Basler","series":"ace","sensor":"onsemi MT9J003","w":3840,"h":2748,"px":1.67,"fmt":"1/2.3","diag":7.9,"shutter":"ローリング","fps":10,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/aca3800-10gc"},{"m":"acA3800-10gm","maker":"Basler","series":"ace","sensor":"onsemi MT9J003","w":3840,"h":2748,"px":1.67,"fmt":"1/2.3","diag":7.9,"shutter":"ローリング","fps":10,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/aca3800-10gm"},{"m":"acA4024-8gc","maker":"Basler","series":"ace","sensor":"Sony IMX226","w":4024,"h":3036,"px":1.85,"fmt":"1/1.7","diag":9.33,"shutter":"ローリング","fps":8.7,"color":"カラー","mount":"C","iface":"GigE","memo":"型番公称8fps","url":"https://docs.baslerweb.com/aca4024-8gc"},{"m":"acA4024-8gm","maker":"Basler","series":"ace","sensor":"Sony IMX226","w":4024,"h":3036,"px":1.85,"fmt":"1/1.7","diag":9.33,"shutter":"ローリング","fps":8.7,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番公称8fps","url":"https://docs.baslerweb.com/aca4024-8gm"},{"m":"acA4096-11gc","maker":"Basler","series":"ace","sensor":"Sony IMX267","w":4096,"h":2168,"px":3.45,"fmt":"1","diag":16.1,"shutter":"グローバル","fps":13.1,"color":"カラー","mount":"C","iface":"GigE","memo":"型番公称11fps","url":"https://docs.baslerweb.com/aca4096-11gc"},{"m":"acA4096-11gm","maker":"Basler","series":"ace","sensor":"Sony IMX267","w":4096,"h":2168,"px":3.45,"fmt":"1","diag":16.1,"shutter":"グローバル","fps":13.1,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番公称11fps","url":"https://docs.baslerweb.com/aca4096-11gm"},{"m":"acA4112-8gc","maker":"Basler","series":"ace","sensor":"Sony IMX304","w":4096,"h":3000,"px":3.45,"fmt":"1.1","diag":17.6,"shutter":"グローバル","fps":9.4,"color":"カラー","mount":"C","iface":"GigE","memo":"型番公称8fps","url":"https://docs.baslerweb.com/aca4112-8gc"},{"m":"acA4112-8gm","maker":"Basler","series":"ace","sensor":"Sony IMX304","w":4096,"h":3000,"px":3.45,"fmt":"1.1","diag":17.6,"shutter":"グローバル","fps":9.4,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番公称8fps","url":"https://docs.baslerweb.com/aca4112-8gm"},{"m":"acA5472-5gc","maker":"Basler","series":"ace","sensor":"Sony IMX183","w":5472,"h":3648,"px":2.4,"fmt":"1","diag":15.86,"shutter":"ローリング","fps":5,"color":"カラー","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/aca5472-5gc"},{"m":"acA5472-5gm","maker":"Basler","series":"ace","sensor":"Sony IMX183","w":5472,"h":3648,"px":2.4,"fmt":"1","diag":15.86,"shutter":"ローリング","fps":5,"color":"モノクロ","mount":"C","iface":"GigE","memo":"","url":"https://docs.baslerweb.com/aca5472-5gm"},{"m":"acA640-300gc","maker":"Basler","series":"ace","sensor":"onsemi PYTHON NOIP1SE0300A","w":640,"h":480,"px":4.8,"fmt":"1/4","diag":3.9,"shutter":"グローバル","fps":376,"color":"カラー","mount":"C","iface":"GigE","memo":"型番公称300fps。376fpsはfast readout時","url":"https://docs.baslerweb.com/aca640-300gc"},{"m":"acA640-300gm","maker":"Basler","series":"ace","sensor":"onsemi PYTHON NOIP1SN0300A","w":640,"h":480,"px":4.8,"fmt":"1/4","diag":3.9,"shutter":"グローバル","fps":376,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番公称300fps。376fpsはfast readout時","url":"https://docs.baslerweb.com/aca640-300gm"},{"m":"acA720-290gc","maker":"Basler","series":"ace","sensor":"Sony IMX287","w":720,"h":540,"px":6.9,"fmt":"1/2.9","diag":6.3,"shutter":"グローバル","fps":291,"color":"カラー","mount":"C","iface":"GigE","memo":"型番公称290fps。既定設定では274fps","url":"https://docs.baslerweb.com/aca720-290gc"},{"m":"acA720-290gm","maker":"Basler","series":"ace","sensor":"Sony IMX287","w":720,"h":540,"px":6.9,"fmt":"1/2.9","diag":6.3,"shutter":"グローバル","fps":291,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番公称290fps。既定設定では274fps","url":"https://docs.baslerweb.com/aca720-290gm"},{"m":"acA800-200gc","maker":"Basler","series":"ace","sensor":"onsemi PYTHON NOIP1SE0500A","w":800,"h":600,"px":4.8,"fmt":"1/3.6","diag":4.8,"shutter":"グローバル","fps":240,"color":"カラー","mount":"C","iface":"GigE","memo":"型番公称200fps。240fpsはfast readout時（通常199fps）","url":"https://docs.baslerweb.com/aca800-200gc"},{"m":"acA800-200gm","maker":"Basler","series":"ace","sensor":"onsemi PYTHON NOIP1SN0500A","w":800,"h":600,"px":4.8,"fmt":"1/3.6","diag":4.8,"shutter":"グローバル","fps":240,"color":"モノクロ","mount":"C","iface":"GigE","memo":"型番公称200fps。240fpsはfast readout時（通常199fps）","url":"https://docs.baslerweb.com/aca800-200gm"}],"lenses":[{"m":"SV-0614H","maker":"VSテクノロジー","series":"SV-H","f":6,"fmt":"2/3","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-0814H","maker":"VSテクノロジー","series":"SV-H","f":8,"fmt":"2/3","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-0914H","maker":"VSテクノロジー","series":"SV-H","f":9,"fmt":"2/3","fopen":1.4,"fmin":null,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"コンパクトタイプ。絞りは全閉まで（最小F値は非公表）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-1214H","maker":"VSテクノロジー","series":"SV-H","f":12,"fmt":"2/3","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"コンパクトタイプ","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-1214HF","maker":"VSテクノロジー","series":"SV-H","f":12,"fmt":"2/3","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-1614H","maker":"VSテクノロジー","series":"SV-H","f":16,"fmt":"2/3","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"コンパクトタイプ","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-1614HF","maker":"VSテクノロジー","series":"SV-H","f":16,"fmt":"2/3","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-2514H","maker":"VSテクノロジー","series":"SV-H","f":25,"fmt":"2/3","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":150,"wdmax":"∞","memo":"","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-3514H","maker":"VSテクノロジー","series":"SV-H","f":35,"fmt":"2/3","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":200,"wdmax":"∞","memo":"","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-5014H","maker":"VSテクノロジー","series":"SV-H","f":50,"fmt":"2/3","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-5026H","maker":"VSテクノロジー","series":"SV-H","f":50,"fmt":"2/3","fopen":2.6,"fmin":null,"feff":null,"mount":"C","wdmin":500,"wdmax":"∞","memo":"コンパクトタイプ。絞りは全閉まで（最小F値は非公表）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-7525H","maker":"VSテクノロジー","series":"SV-H","f":75,"fmt":"1","fopen":2.5,"fmin":null,"feff":null,"mount":"C","wdmin":1200,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-10028H","maker":"VSテクノロジー","series":"SV-H","f":100,"fmt":"1","fopen":2.5,"fmin":null,"feff":null,"mount":"C","wdmin":2000,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000007","kind":"一次"},{"m":"SV-03514V","maker":"VSテクノロジー","series":"SV-V","f":3.5,"fmt":"1/2","fopen":1.4,"fmin":null,"feff":null,"mount":"C","wdmin":200,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://www.hikarimart.net/products/lens/svv.html","kind":"代理店"},{"m":"SV-04514V","maker":"VSテクノロジー","series":"SV-V","f":4.5,"fmt":"1/2","fopen":1.4,"fmin":null,"feff":null,"mount":"C","wdmin":200,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://www.hikarimart.net/products/lens/svv.html","kind":"代理店"},{"m":"SV-0614V","maker":"VSテクノロジー","series":"SV-V","f":6,"fmt":"1/2","fopen":1.4,"fmin":null,"feff":null,"mount":"C","wdmin":200,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://www.hikarimart.net/products/lens/svv.html","kind":"代理店"},{"m":"SV-0813V","maker":"VSテクノロジー","series":"SV-V","f":8,"fmt":"2/3","fopen":1.3,"fmin":null,"feff":null,"mount":"C","wdmin":200,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://www.hikarimart.net/products/lens/svv.html","kind":"代理店"},{"m":"SV-1214V","maker":"VSテクノロジー","series":"SV-V","f":12,"fmt":"1/2","fopen":1.4,"fmin":null,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://www.hikarimart.net/products/lens/svv.html","kind":"代理店"},{"m":"SV-1614V","maker":"VSテクノロジー","series":"SV-V","f":16,"fmt":"2/3","fopen":1.4,"fmin":null,"feff":null,"mount":"C","wdmin":400,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://www.hikarimart.net/products/lens/svv.html","kind":"代理店"},{"m":"SV-2514V","maker":"VSテクノロジー","series":"SV-V","f":25,"fmt":"1","fopen":1.4,"fmin":null,"feff":null,"mount":"C","wdmin":500,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://www.hikarimart.net/products/lens/svv.html","kind":"代理店"},{"m":"SV-3518V","maker":"VSテクノロジー","series":"SV-V","f":35,"fmt":"2/3","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://www.hikarimart.net/products/lens/svv.html","kind":"代理店"},{"m":"SV-5018V","maker":"VSテクノロジー","series":"SV-V","f":50,"fmt":"2/3","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":1000,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://www.hikarimart.net/products/lens/svv.html","kind":"代理店"},{"m":"SV-7527V","maker":"VSテクノロジー","series":"SV-V","f":75,"fmt":"1/2","fopen":2.7,"fmin":null,"feff":null,"mount":"C","wdmin":1000,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://www.hikarimart.net/products/lens/svv.html","kind":"代理店"},{"m":"SV-10035V","maker":"VSテクノロジー","series":"SV-V","f":100,"fmt":"1/2","fopen":3.5,"fmin":null,"feff":null,"mount":"C","wdmin":1000,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://www.hikarimart.net/products/lens/svv.html","kind":"代理店"},{"m":"VS-25085/C","maker":"VSテクノロジー","series":"VS-085","f":25,"fmt":"4/3","fopen":0.85,"fmin":null,"feff":null,"mount":"C","wdmin":170,"wdmax":"∞","memo":"Cマウント。F0.85の高輝度レンズ","url":"https://www.hikarimart.net/products/lens/vs085.html","kind":"代理店"},{"m":"VS-25085/M42","maker":"VSテクノロジー","series":"VS-085","f":25,"fmt":"4/3","fopen":0.85,"fmin":null,"feff":null,"mount":"M42","wdmin":170,"wdmax":"∞","memo":"M42マウント","url":"https://www.hikarimart.net/products/lens/vs085.html","kind":"代理店"},{"m":"VS-50085/C","maker":"VSテクノロジー","series":"VS-085","f":50,"fmt":"4/3","fopen":0.85,"fmin":null,"feff":null,"mount":"C","wdmin":240,"wdmax":"∞","memo":"Cマウント。F0.85の高輝度レンズ","url":"https://www.hikarimart.net/products/lens/vs085.html","kind":"代理店"},{"m":"VS-50085/M42","maker":"VSテクノロジー","series":"VS-085","f":50,"fmt":"4/3","fopen":0.85,"fmin":null,"feff":null,"mount":"M42","wdmin":240,"wdmax":"∞","memo":"M42マウント","url":"https://www.hikarimart.net/products/lens/vs085.html","kind":"代理店"},{"m":"VS-H1620-IRC","maker":"VSテクノロジー","series":"VS-H-IRC","f":16,"fmt":"2/3","fopen":2.0,"fmin":16,"feff":null,"mount":"C","wdmin":500,"wdmax":"∞","memo":"IR補正","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000001","kind":"一次"},{"m":"VS-H2520-IRC","maker":"VSテクノロジー","series":"VS-H-IRC","f":25,"fmt":"2/3","fopen":2.0,"fmin":16,"feff":null,"mount":"C","wdmin":500,"wdmax":"∞","memo":"IR補正","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000001","kind":"一次"},{"m":"VS-H3520-IRC","maker":"VSテクノロジー","series":"VS-H-IRC","f":35,"fmt":"2/3","fopen":2.0,"fmin":16,"feff":null,"mount":"C","wdmin":500,"wdmax":"∞","memo":"IR補正","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000001","kind":"一次"},{"m":"VS-H1218-IRC/11","maker":"VSテクノロジー","series":"VS-H-IRC/11","f":12,"fmt":"1.1","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"IR補正・1.1型対応。絞りは全閉まで（最小F値は非公表）","url":"https://vitalvisiontechnology.com/vs-h1218-irc-11/","kind":"代理店"},{"m":"VS-H1618-IRC/11","maker":"VSテクノロジー","series":"VS-H-IRC/11","f":16,"fmt":"1.1","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"IR補正・1.1型対応。絞りは全閉まで（最小F値は非公表）","url":"https://vitalvisiontechnology.com/vs-h1218-irc-11/","kind":"代理店"},{"m":"VS-H2518-IRC/11","maker":"VSテクノロジー","series":"VS-H-IRC/11","f":25,"fmt":"1.1","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"IR補正・1.1型対応。絞りは全閉まで（最小F値は非公表）","url":"https://vitalvisiontechnology.com/vs-h1218-irc-11/","kind":"代理店"},{"m":"VS-0818H/3CMOS","maker":"VSテクノロジー","series":"VS-H/3CMOS","f":8,"fmt":"1/1.8","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"3CMOSカメラ用。生産終了（最終受注2025-04-30、後継VS-0824HN/3CMOS）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000013","kind":"一次"},{"m":"VS-1218H/3CMOS","maker":"VSテクノロジー","series":"VS-H/3CMOS","f":12,"fmt":"1/1.8","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":150,"wdmax":"∞","memo":"3CMOSカメラ用","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000013","kind":"一次"},{"m":"VS-2518H/3CMOS","maker":"VSテクノロジー","series":"VS-H/3CMOS","f":25,"fmt":"1/1.8","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":200,"wdmax":"∞","memo":"3CMOSカメラ用","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000013","kind":"一次"},{"m":"VS-0618H1-SWIR","maker":"VSテクノロジー","series":"VS-H1-SWIR","f":6,"fmt":"1","fopen":1.8,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"SWIR（短波赤外）用","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000002","kind":"一次"},{"m":"VS-0814H1-SWIR","maker":"VSテクノロジー","series":"VS-H1-SWIR","f":8,"fmt":"1","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"SWIR（短波赤外）用","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000002","kind":"一次"},{"m":"VS-1214H1-SWIR","maker":"VSテクノロジー","series":"VS-H1-SWIR","f":12,"fmt":"1","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"SWIR（短波赤外）用","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000002","kind":"一次"},{"m":"VS-1614H1N-SWIR","maker":"VSテクノロジー","series":"VS-H1-SWIR","f":16,"fmt":"1","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"SWIR（短波赤外）用","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000002","kind":"一次"},{"m":"VS-2514H1-SWIR","maker":"VSテクノロジー","series":"VS-H1-SWIR","f":25,"fmt":"1","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"SWIR（短波赤外）用","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000002","kind":"一次"},{"m":"VS-3514H1-SWIR","maker":"VSテクノロジー","series":"VS-H1-SWIR","f":35,"fmt":"1","fopen":1.4,"fmin":16,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"SWIR（短波赤外）用","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000002","kind":"一次"},{"m":"VS-5018H1-SWIR","maker":"VSテクノロジー","series":"VS-H1-SWIR","f":50,"fmt":"1","fopen":1.8,"fmin":16,"feff":null,"mount":"C","wdmin":500,"wdmax":"∞","memo":"SWIR（短波赤外）用","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000002","kind":"一次"},{"m":"VS-0828HV","maker":"VSテクノロジー","series":"VS-HV","f":8,"fmt":"1.1","fopen":2.8,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"","url":"https://www.ff-net.jp/ffhome/lens/vshv.html","kind":"代理店"},{"m":"VS-1220HV","maker":"VSテクノロジー","series":"VS-HV","f":12,"fmt":"1.1","fopen":2.0,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"","url":"https://www.ff-net.jp/ffhome/lens/vshv.html","kind":"代理店"},{"m":"VS-1620HV","maker":"VSテクノロジー","series":"VS-HV","f":16,"fmt":"1.1","fopen":2.0,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"","url":"https://www.ff-net.jp/ffhome/lens/vshv.html","kind":"代理店"},{"m":"VS-LDA4","maker":"VSテクノロジー","series":"VS-LDA","f":4.14,"fmt":"1/2","fopen":2.0,"fmin":null,"feff":"2.1","mount":"C","wdmin":92.7,"wdmax":403.2,"memo":"公称f=4mm（実効4.14mm）。1/3型にも対応","url":"https://www.rmaelectronics.com/content/VST%20America/VS-LDA%20Series/VS-LDA4_Specsheet_English.pdf","kind":"一次"},{"m":"VS-LDA6.5","maker":"VSテクノロジー","series":"VS-LDA","f":6.5,"fmt":"1/2","fopen":null,"fmin":null,"feff":"2.3","mount":"C","wdmin":95.2,"wdmax":653.2,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lda-series/","kind":"代理店"},{"m":"VS-LDA10","maker":"VSテクノロジー","series":"VS-LDA","f":10.25,"fmt":"1/2","fopen":2.2,"fmin":null,"feff":"2.3〜2.4","mount":"C","wdmin":91.0,"wdmax":330.2,"memo":"公称f=10mm（実効10.25mm）","url":"https://www.rmaelectronics.com/content/VST%20America/VS-LDA%20Series/VS-LDA10_Specsheet_English.pdf","kind":"一次"},{"m":"VS-LDA15","maker":"VSテクノロジー","series":"VS-LDA","f":15,"fmt":"2/3","fopen":null,"fmin":null,"feff":"2.1〜2.2","mount":"C","wdmin":88.9,"wdmax":489.2,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lda-series/","kind":"代理店"},{"m":"VS-LDA20","maker":"VSテクノロジー","series":"VS-LDA","f":20,"fmt":"2/3","fopen":null,"fmin":null,"feff":"2.1〜2.3","mount":"C","wdmin":86.6,"wdmax":510.3,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lda-series/","kind":"代理店"},{"m":"VS-LDA25","maker":"VSテクノロジー","series":"VS-LDA","f":25,"fmt":"2/3","fopen":null,"fmin":null,"feff":"2.1〜2.6","mount":"C","wdmin":100.2,"wdmax":508.2,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lda-series/","kind":"代理店"},{"m":"VS-LDA30","maker":"VSテクノロジー","series":"VS-LDA","f":30,"fmt":"2/3","fopen":null,"fmin":null,"feff":"2.4〜2.8","mount":"C","wdmin":141.5,"wdmax":381.6,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lda-series/","kind":"代理店"},{"m":"VS-LDA35","maker":"VSテクノロジー","series":"VS-LDA","f":35,"fmt":"2/3","fopen":null,"fmin":null,"feff":"2.5〜2.9","mount":"C","wdmin":96.1,"wdmax":142.9,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lda-series/","kind":"代理店"},{"m":"VS-LDA50","maker":"VSテクノロジー","series":"VS-LDA","f":50,"fmt":"2/3","fopen":null,"fmin":null,"feff":"2.7〜3.1","mount":"C","wdmin":221.5,"wdmax":512.4,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lda-series/","kind":"代理店"},{"m":"VS-LDA75","maker":"VSテクノロジー","series":"VS-LDA","f":75,"fmt":"2/3","fopen":null,"fmin":null,"feff":"4.1〜4.5","mount":"C","wdmin":245.6,"wdmax":527.5,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lda-series/","kind":"代理店"},{"m":"VS-LDV25","maker":"VSテクノロジー","series":"VS-LDV","f":25,"fmt":"1.1","fopen":3.5,"fmin":16,"feff":null,"mount":"C","wdmin":100,"wdmax":500,"memo":"","url":"https://vitalvisiontechnology.com/machine-vision-lenses-low-distortion-macro-lens-vs-ldv-series/","kind":"代理店"},{"m":"VS-LDV35","maker":"VSテクノロジー","series":"VS-LDV","f":35,"fmt":"1.1","fopen":3.5,"fmin":16,"feff":null,"mount":"C","wdmin":150,"wdmax":500,"memo":"","url":"https://vitalvisiontechnology.com/machine-vision-lenses-low-distortion-macro-lens-vs-ldv-series/","kind":"代理店"},{"m":"VS-LDV50","maker":"VSテクノロジー","series":"VS-LDV","f":50,"fmt":"1.1","fopen":3.5,"fmin":22,"feff":null,"mount":"C","wdmin":150,"wdmax":500,"memo":"","url":"https://vitalvisiontechnology.com/machine-vision-lenses-low-distortion-macro-lens-vs-ldv-series/","kind":"代理店"},{"m":"VS-LDV75","maker":"VSテクノロジー","series":"VS-LDV","f":75,"fmt":"1.1","fopen":4.0,"fmin":22,"feff":null,"mount":"C","wdmin":150,"wdmax":500,"memo":"","url":"https://vitalvisiontechnology.com/machine-vision-lenses-low-distortion-macro-lens-vs-ldv-series/","kind":"代理店"},{"m":"VS-LLD10","maker":"VSテクノロジー","series":"VS-LLD","f":10,"fmt":"4/3","fopen":null,"fmin":null,"feff":"2.9〜3.1","mount":"C","wdmin":53.1,"wdmax":189.6,"memo":"倍率0.05〜0.15倍。開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lld-series/","kind":"代理店"},{"m":"VS-LLD12.5","maker":"VSテクノロジー","series":"VS-LLD","f":12.5,"fmt":"4/3","fopen":null,"fmin":null,"feff":"2.5〜2.7","mount":"C","wdmin":40.9,"wdmax":232.0,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lld-series/","kind":"代理店"},{"m":"VS-LLD15","maker":"VSテクノロジー","series":"VS-LLD","f":15,"fmt":"4/3","fopen":null,"fmin":null,"feff":"2.1〜2.3","mount":"C","wdmin":56.8,"wdmax":285.2,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lld-series/","kind":"代理店"},{"m":"VS-LLD18","maker":"VSテクノロジー","series":"VS-LLD","f":18,"fmt":"4/3","fopen":null,"fmin":null,"feff":"2.1〜2.3","mount":"C","wdmin":53.8,"wdmax":347.0,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lld-series/","kind":"代理店"},{"m":"VS-LLD20","maker":"VSテクノロジー","series":"VS-LLD","f":20,"fmt":"4/3","fopen":2.0,"fmin":null,"feff":"2.1〜2.3","mount":"C","wdmin":61.8,"wdmax":386.4,"memo":"","url":"https://www.rmaelectronics.com/content/VST%20America/VS-LLD/specs/VS-LLD20_SpecSheet_E.pdf","kind":"一次"},{"m":"VS-LLD25","maker":"VSテクノロジー","series":"VS-LLD","f":25,"fmt":"4/3","fopen":null,"fmin":null,"feff":"2.1〜2.5","mount":"C","wdmin":66.0,"wdmax":493.0,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lld-series/","kind":"代理店"},{"m":"VS-LLD30","maker":"VSテクノロジー","series":"VS-LLD","f":30,"fmt":"4/3","fopen":null,"fmin":null,"feff":"2.2〜2.7","mount":"C","wdmin":93.1,"wdmax":595.3,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lld-series/","kind":"代理店"},{"m":"VS-LLD35","maker":"VSテクノロジー","series":"VS-LLD","f":35,"fmt":"4/3","fopen":null,"fmin":null,"feff":"2.2〜3.0","mount":"C","wdmin":129.5,"wdmax":706.6,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lld-series/","kind":"代理店"},{"m":"VS-LLD50","maker":"VSテクノロジー","series":"VS-LLD","f":50,"fmt":"4/3","fopen":null,"fmin":null,"feff":"2.2〜3.2","mount":"C","wdmin":205.4,"wdmax":1012.4,"memo":"開放F値は未確認（シリーズ表の数値は実効F値）","url":"https://vitalvisiontechnology.com/machine-vision-lenses-fixed-focal-tv-lens-vs-lld-series/","kind":"代理店"},{"m":"VS-MCA4","maker":"VSテクノロジー","series":"VS-MCA","f":4,"fmt":"1/2","fopen":null,"fmin":null,"feff":null,"mount":"C","wdmin":92.7,"wdmax":403.2,"memo":"固定絞り。F値は未確認","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/macrolens/S000019","kind":"一次"},{"m":"VS-MCA6.5","maker":"VSテクノロジー","series":"VS-MCA","f":6.5,"fmt":"1/2","fopen":2.2,"fmin":null,"feff":null,"mount":"C","wdmin":98.0,"wdmax":656.0,"memo":"固定絞り","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/macrolens/S000019","kind":"一次"},{"m":"VS-MCA10","maker":"VSテクノロジー","series":"VS-MCA","f":10,"fmt":"1/2","fopen":2.0,"fmin":null,"feff":null,"mount":"C","wdmin":59.9,"wdmax":504.1,"memo":"固定絞り","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/macrolens/S000019","kind":"一次"},{"m":"VS-MCA15","maker":"VSテクノロジー","series":"VS-MCA","f":15,"fmt":"2/3","fopen":2.0,"fmin":null,"feff":null,"mount":"C","wdmin":40.3,"wdmax":490.7,"memo":"固定絞り","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/macrolens/S000019","kind":"一次"},{"m":"VS-MCA20","maker":"VSテクノロジー","series":"VS-MCA","f":20,"fmt":"2/3","fopen":2.0,"fmin":null,"feff":null,"mount":"C","wdmin":50.7,"wdmax":516.8,"memo":"固定絞り","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/macrolens/S000019","kind":"一次"},{"m":"VS-MCA25","maker":"VSテクノロジー","series":"VS-MCA","f":25,"fmt":"2/3","fopen":2.0,"fmin":null,"feff":null,"mount":"C","wdmin":55.6,"wdmax":514.6,"memo":"固定絞り。VST Americaの販売名は25.5mm","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/macrolens/S000019","kind":"一次"},{"m":"VS-MCA30","maker":"VSテクノロジー","series":"VS-MCA","f":30,"fmt":"2/3","fopen":2.0,"fmin":null,"feff":null,"mount":"C","wdmin":80.1,"wdmax":513.5,"memo":"固定絞り","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/macrolens/S000019","kind":"一次"},{"m":"VS-MCA35","maker":"VSテクノロジー","series":"VS-MCA","f":35,"fmt":"2/3","fopen":1.9,"fmin":null,"feff":null,"mount":"C","wdmin":83.1,"wdmax":163.9,"memo":"固定絞り","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/macrolens/S000019","kind":"一次"},{"m":"VS-MCA50","maker":"VSテクノロジー","series":"VS-MCA","f":50,"fmt":"2/3","fopen":2.5,"fmin":null,"feff":null,"mount":"C","wdmin":128.7,"wdmax":633.6,"memo":"固定絞り","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/macrolens/S000019","kind":"一次"},{"m":"VS-MCA75","maker":"VSテクノロジー","series":"VS-MCA","f":75,"fmt":"2/3","fopen":3.8,"fmin":null,"feff":null,"mount":"C","wdmin":153.8,"wdmax":562.9,"memo":"固定絞り","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/macrolens/S000019","kind":"一次"},{"m":"VS-MC08H1","maker":"VSテクノロジー","series":"VS-MCH1","f":8,"fmt":"1","fopen":1.4,"fmin":8,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"絞りF1.4/5.6/8の3段切替","url":"https://vitalvisiontechnology.com/vs-mch1-series-2/","kind":"代理店"},{"m":"VS-MC12H1","maker":"VSテクノロジー","series":"VS-MCH1","f":12,"fmt":"1","fopen":1.4,"fmin":8,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"絞りF1.4/5.6/8の3段切替","url":"https://vitalvisiontechnology.com/vs-mch1-series-2/","kind":"代理店"},{"m":"VS-MC16H1","maker":"VSテクノロジー","series":"VS-MCH1","f":16,"fmt":"1","fopen":1.4,"fmin":8,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"絞りF1.4/5.6/8の3段切替","url":"https://vitalvisiontechnology.com/vs-mch1-series-2/","kind":"代理店"},{"m":"VS-MC25H1","maker":"VSテクノロジー","series":"VS-MCH1","f":25,"fmt":"1","fopen":1.4,"fmin":8,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"絞りF1.4/5.6/8の3段切替","url":"https://vitalvisiontechnology.com/vs-mch1-series-2/","kind":"代理店"},{"m":"VS-MC35H1","maker":"VSテクノロジー","series":"VS-MCH1","f":35,"fmt":"1","fopen":1.4,"fmin":8,"feff":null,"mount":"C","wdmin":300,"wdmax":"∞","memo":"絞りF1.4/5.6/8の3段切替","url":"https://vitalvisiontechnology.com/vs-mch1-series-2/","kind":"代理店"},{"m":"VS-MC50H1","maker":"VSテクノロジー","series":"VS-MCH1","f":50,"fmt":"1","fopen":1.8,"fmin":8,"feff":null,"mount":"C","wdmin":500,"wdmax":"∞","memo":"絞りF1.8/5.6/8の3段切替","url":"https://vitalvisiontechnology.com/vs-mch1-series-2/","kind":"代理店"},{"m":"VS-0620VM","maker":"VSテクノロジー","series":"VS-VM","f":6,"fmt":"1/1.8","fopen":2.0,"fmin":null,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000008","kind":"一次"},{"m":"VS-0818VM","maker":"VSテクノロジー","series":"VS-VM","f":8,"fmt":"1/1.8","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000008","kind":"一次"},{"m":"VS-1218VM","maker":"VSテクノロジー","series":"VS-VM","f":12,"fmt":"1/1.8","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000008","kind":"一次"},{"m":"VS-1618VM","maker":"VSテクノロジー","series":"VS-VM","f":16,"fmt":"1/1.8","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":100,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000008","kind":"一次"},{"m":"VS-2518VM","maker":"VSテクノロジー","series":"VS-VM","f":25,"fmt":"1/1.8","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":250,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000008","kind":"一次"},{"m":"VS-3518VM","maker":"VSテクノロジー","series":"VS-VM","f":35,"fmt":"1/1.8","fopen":1.8,"fmin":null,"feff":null,"mount":"C","wdmin":250,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000008","kind":"一次"},{"m":"VS-5026VM","maker":"VSテクノロジー","series":"VS-VM","f":50,"fmt":"1/1.8","fopen":2.6,"fmin":null,"feff":null,"mount":"C","wdmin":400,"wdmax":"∞","memo":"絞りは全閉まで（最小F値は非公表）","url":"https://en-51702.site-translation.com/products/machine-vision-lenses/ffl/S000008","kind":"一次"}],"formats":[["1/4",4.0,""],["1/3.6",5.0,""],["1/3.2",5.7,""],["1/3.1",5.8,""],["1/3",6.0,""],["1/2.9",6.3,""],["1/2.8",6.4,""],["1/2.5",7.2,""],["1/2.3",7.7,""],["1/2",8.0,""],["1/1.8",9.0,""],["1/1.7",9.5,""],["1/1.6",10.0,""],["1/1.2",13.4,""],["1/1.1",14.0,"Baslerがa2A4096系で用いる表記"],["2/3",11.0,"2/3型センサの実対角は11.1mmでこの値をわずかに超える"],["1",16.0,""],["1.1",17.6,""],["1.2",19.3,"Baslerがa2A5328系で用いる表記"],["4/3",22.5,"フォーサーズ。21.6mmとする資料もある"],["APS-C",28.4,""],["35mm",43.3,"フルサイズ"]],"tol":0.03,"date":"2026-08-14"};
+// 光学系選定の計算と判定。画面には触らない（node のテストからも読む）。
+// 式と判定は Excel版（..\optics_sheet_src\build_sheet.py）と同じにしてある。空欄は null で表す。
+//   カメラ {m, series, sensor, w, h, px, fmt, diag, mount, ...}  ＋ prep() が sw, sh を足す
+//   レンズ {m, series, f, fmt, fopen, mount, wdmin, wdmax, ...}  ＋ prep() が ic を足す（wdmax は数値か "∞"）
+//   条件   {cam, lens, fov, fno, coc, res, speed, tol}
+const Calc = (() => {
+  const OK = "● OK", WARN = "▲ 要確認", NG = "✕ NG", NA = "－", INF = "∞";
+  const num = x => typeof x === "number" && isFinite(x);
+  const div = (a, b) => (num(a) && num(b) && b !== 0 ? a / b : null);
+  const fx = (x, d) => x.toFixed(d);
+  const int = x => Math.round(x).toLocaleString("en-US");
+
+  // 台帳に計算で決まる値を足す。センサ寸法は画素数×画素サイズ、像円は対応フォーマットから引く
+  function prep(cams, lenses, formats) {
+    const ic = new Map(formats.map(r => [r[0], r[1]]));
+    for (const c of cams) { c.sw = c.w * c.px / 1000; c.sh = c.h * c.px / 1000; }
+    for (const l of lenses) l.ic = ic.has(l.fmt) ? ic.get(l.fmt) : null;
+  }
+
+  // ---- 判定（3段階＋余裕の数値）----
+  // 像円: センサ対角 ≦ 像円 ならOK、像円×(1+許容率) までなら要確認
+  function judgeIC(diag, ic, tol) {
+    if (!num(diag) || !num(ic)) return { j: NA, margin: null, pct: null };
+    const j = diag <= ic ? OK : diag <= ic * (1 + tol) ? WARN : NG;
+    return { j, margin: ic - diag, pct: (ic - diag) / ic };
+  }
+  function judgeMount(cm, lm) {
+    if (!cm || !lm) return { j: NA };
+    return { j: cm === lm ? OK : NG };
+  }
+  // WD範囲: 最大WDが数値でない（∞）なら上限なし。最短WDが未記入なら要確認
+  //   d      … 外れた側の差（不足は負、超過は正）。範囲内なら最短WDからの余裕
+  //   margin … 範囲内のとき、近い方の端までの余裕
+  function judgeWD(wd, wdmin, wdmax) {
+    if (!num(wdmin)) return { j: WARN, kind: null, d: null, margin: null };
+    if (!num(wd)) return { j: NA, kind: null, d: null, margin: null };
+    if (wd < wdmin) return { j: NG, kind: "short", d: wd - wdmin, margin: wd - wdmin };
+    if (num(wdmax) && wd > wdmax) return { j: NG, kind: "over", d: wd - wdmax, margin: wd - wdmax };
+    return { j: OK, kind: "ok", d: wd - wdmin, margin: Math.min(wd - wdmin, num(wdmax) ? wdmax - wd : wd - wdmin) };
+  }
+  function judgePix(w, need) {
+    if (!num(w) || !num(need)) return { j: NA, margin: null };
+    return { j: w >= need ? OK : NG, margin: w - need };
+  }
+  function judgeRes(res, target) {
+    if (!num(res) || !num(target)) return { j: NA, margin: null };
+    return { j: res <= target ? OK : NG, margin: target - res };
+  }
+  // 総合。✕が1つでもあればNG、▲があれば要確認、判定できないものがあれば「－」
+  function overall(js, nas) {
+    if (js.some(j => j === NG)) return NG;
+    if (js.some(j => j === WARN)) return WARN;
+    if ((nas || js).some(j => j === NA)) return NA;
+    return OK;
+  }
+  const order = j => (j === OK ? 0 : j === WARN ? 1 : j === NG ? 2 : 3);
+
+  // ---- 光学の式 ----
+  const wdOf = (f, fov, sw) => (num(f) && num(fov) && num(sw) && sw !== 0 ? f * (1 + fov / sw) : null);
+  // 被写界深度。過焦点距離を超えると後方の分母が0以下になるので ∞ を返す
+  function dof(wd, f, delta, fno) {
+    if (!num(wd) || !num(f) || !num(delta) || !num(fno)) return { front: null, rear: null, total: null };
+    const k = wd * delta * fno;
+    const front = div(wd * k, f * f + k);
+    if (f * f - k <= 0) return { front, rear: INF, total: INF };
+    const rear = wd * k / (f * f - k);
+    return { front, rear, total: num(front) ? front + rear : null };
+  }
+
+  // ---- 1組の評価（Excelのメインシート）----
+  function evaluate(inp) {
+    const c = inp.cam || {}, l = inp.lens || {};
+    const fov = inp.fov, tol = num(inp.tol) ? inp.tol : 0;
+    const wd = wdOf(l.f, fov, c.sw);
+    const res = div(fov, c.w);
+    const needPix = div(fov, inp.res);
+    const delta = num(c.px) && num(inp.coc) ? c.px / 1000 * inp.coc : null;
+    const d = dof(wd, l.f, delta, inp.fno);
+    const hyper = num(l.f) && num(delta) && num(inp.fno) && delta * inp.fno !== 0 ? l.f * l.f / (delta * inp.fno) + l.f : null;
+    const v = num(inp.speed) ? inp.speed / 60 * 1000 : null;
+    const tpix = div(res, v);
+    const ic = judgeIC(c.diag, l.ic, tol), mount = judgeMount(c.mount, l.mount);
+    const jwd = judgeWD(wd, l.wdmin, l.wdmax), pix = judgePix(c.w, needPix);
+    return {
+      mag: div(c.sw, fov), wd, fovH: num(fov) ? fov : null,
+      fovV: num(fov) && num(c.sh) && num(c.sw) && c.sw !== 0 ? fov * c.sh / c.sw : null,
+      res, maxFov: num(fov) && num(l.ic) && num(c.diag) && c.diag !== 0 ? fov * l.ic / c.diag : null, needPix,
+      delta, hyper, dofFront: d.front, dofRear: d.rear, dofTotal: d.total,
+      speed: v, tpixSec: tpix, tpixMs: num(tpix) ? tpix * 1000 : null, tpixUs: num(tpix) ? tpix * 1e6 : null,
+      ic, mount, jwd, pix,
+      all: overall([ic.j, mount.j, jwd.j, pix.j]),
+    };
+  }
+
+  // ---- カメラを固定してレンズを総当たり（カメラ基準逆引き）----
+  function findLenses(inp, lenses) {
+    const c = inp.cam || {}, tol = num(inp.tol) ? inp.tol : 0;
+    const pix = judgePix(c.w, div(inp.fov, inp.res));     // カメラ側だけで決まる。全レンズ共通
+    const rows = lenses.map((l, i) => {
+      const wd = wdOf(l.f, inp.fov, c.sw);
+      const ic = judgeIC(c.diag, l.ic, tol), mount = judgeMount(c.mount, l.mount), jwd = judgeWD(wd, l.wdmin, l.wdmax);
+      const all = overall([ic.j, mount.j, jwd.j, pix.j], [ic.j, mount.j, jwd.j]);
+      return { i, lens: l, wd, ic, mount, jwd, all, ord: order(all) };
+    });
+    // 良い順: OK → 要確認、同じなら焦点距離の短い順、さらに同じなら台帳の並び順。NGは載せない
+    const ranked = rows.filter(r => r.ord < 2).sort((a, b) => a.ord - b.ord || a.lens.f - b.lens.f || a.i - b.i);
+    const n = j => rows.filter(r => r.all === j).length;
+    const nOK = n(OK), nWarn = n(WARN);
+    const diag = !inp.cam ? "カメラが選ばれていません。カメラを選んでください。"
+      : pix.j === NG ? "このカメラは画素数が足りない。レンズを変えても解決しないので、目標分解能をゆるめるか視野幅を狭めるか、画素数の多いカメラにする。"
+      : nOK > 0 ? "そのまま OK になるレンズが " + nOK + " 本ある。下の一覧から選ぶ。"
+      : nWarn > 0 ? "OK になるレンズは無いが、要確認なら " + nWarn + " 本ある。像円の余裕（下表）を見て判断する。"
+      : "条件を満たすレンズが無い。視野幅かカメラを見直す。";
+    return { rows, ranked, pix, diag, count: { ok: nOK, warn: nWarn, ng: n(NG) },
+      fail: { ic: rows.filter(r => r.ic.j === NG).length, mount: rows.filter(r => r.mount.j === NG).length, wd: rows.filter(r => r.jwd.j === NG).length } };
+  }
+
+  // ---- レンズを固定してカメラを総当たり（レンズ基準逆引き）----
+  function findCameras(inp, cams) {
+    const l = inp.lens || {}, tol = num(inp.tol) ? inp.tol : 0;
+    const need = div(inp.fov, inp.res);
+    const rows = cams.map((c, i) => {
+      const wd = wdOf(l.f, inp.fov, c.sw);
+      const ic = judgeIC(c.diag, l.ic, tol), mount = judgeMount(c.mount, l.mount);
+      const jwd = judgeWD(wd, l.wdmin, l.wdmax), pix = judgePix(c.w, need);
+      const all = overall([ic.j, mount.j, jwd.j, pix.j]);
+      return { i, cam: c, wd, res: div(inp.fov, c.w), ic, mount, jwd, pix, all, ord: order(all) };
+    });
+    // 良い順: OK → 要確認、同じなら画素数（横）の多い順、さらに同じなら台帳の並び順
+    const ranked = rows.filter(r => r.ord < 2).sort((a, b) => a.ord - b.ord || b.cam.w - a.cam.w || a.i - b.i);
+    const n = j => rows.filter(r => r.all === j).length;
+    const nOK = n(OK), nWarn = n(WARN);
+    const diag = !inp.lens ? "レンズが選ばれていません。レンズを選んでください。"
+      : nOK > 0 ? "そのまま OK になるカメラが " + nOK + " 台ある。下の一覧から選ぶ。"
+      : nWarn > 0 ? "OK になるカメラは無いが、要確認なら " + nWarn + " 台ある。像円の余裕（下表）を見て判断する。"
+      : "条件を満たすカメラが無い。視野幅か目標分解能、あるいはレンズを見直す。";
+    const f = k => rows.filter(r => r[k].j === NG).length;
+    return { rows, ranked, need, diag, count: { ok: nOK, warn: nWarn, ng: n(NG) },
+      fail: { ic: f("ic"), mount: f("mount"), wd: f("jwd"), pix: f("pix") } };
+  }
+
+  // ---- 取付距離(WD)の範囲から カメラ×レンズ を探す（機械設計用）----
+  // 1台のカメラにつき最良のレンズ1本。スコア＝段階×1000000＋|算出WD−探索の中心|（小さいほど良い）
+  //   段階0 … そのままOK ／ 段階1 … 要確認（像円が許容率の帯に入る・レンズの最短WDが未記入）
+  const NO_PIX = "画素数不足", NO_LENS = "このWD範囲に合うレンズが無い";
+  function findByWD(inp, cams, lenses, wdMin, wdMax) {
+    const tol = num(inp.tol) ? inp.tol : 0, need = div(inp.fov, inp.res);
+    const lo = num(wdMin) ? wdMin : null, hi = num(wdMax) ? wdMax : null;
+    const none = lo === null && hi === null;
+    const center = none ? 0 : hi === null ? lo : lo === null ? hi : (lo + hi) / 2;
+    const rows = cams.map((c, i) => {
+      const W = num(inp.fov) && num(c.sw) && c.sw !== 0 ? 1 + inp.fov / c.sw : null;
+      let best = null, bestScore = null, count = 0;
+      if (W !== null && num(need) && num(c.diag)) for (const l of lenses) {
+        if (!num(l.f) || !num(l.ic) || l.mount !== c.mount) continue;
+        const wd = l.f * W;
+        if (!(c.diag <= l.ic * (1 + tol)) || !(c.w >= need)) continue;
+        if ((lo !== null && wd < lo) || (hi !== null && wd > hi)) continue;
+        if ((num(l.wdmin) && wd < l.wdmin) || (num(l.wdmax) && wd > l.wdmax)) continue;
+        const score = (c.diag > l.ic || !num(l.wdmin) ? 1000000 : 0) + Math.abs(wd - center);
+        count++;
+        if (bestScore === null || score < bestScore) { bestScore = score; best = l; }
+      }
+      const wd = best ? best.f * W : null;
+      return {
+        i, cam: c, res: div(inp.fov, c.w), needF: none || W === null ? null : center / W,
+        lens: best, wd, score: bestScore, count,
+        wdMargin: !best || none ? null : Math.min(lo === null ? 1000000 : wd - lo, hi === null ? 1000000 : hi - wd),
+        icMargin: best ? best.ic - c.diag : null,
+        reason: count > 0 ? "" : num(need) && c.w < need ? NO_PIX : NO_LENS,
+        all: bestScore === null ? NG : bestScore >= 1000000 ? WARN : OK,
+      };
+    });
+    const ranked = rows.filter(r => r.score !== null).sort((a, b) => a.score - b.score || a.i - b.i);
+    const n = j => rows.filter(r => r.all === j).length;
+    const nOK = n(OK), nWarn = n(WARN);
+    const range = none ? "制限なし" : lo === null ? "〜" + int(hi) + " mm" : hi === null ? int(lo) + " mm〜" : int(lo) + "〜" + int(hi) + " mm";
+    const nf = rows.map(r => r.needF).filter(num), lf = lenses.map(l => l.f).filter(num);
+    const span = a => (a.length ? fx(Math.min(...a), 1) + "〜" + fx(Math.max(...a), 1) : "－");
+    const noPix = rows.filter(r => r.reason === NO_PIX).length;
+    const diag = none ? "機械側の WD 範囲を入れてください。最小・最大のどちらかだけでも探せます。"
+      : nOK > 0 ? "WD " + range + " に収まる組合せが " + nOK + " 通りある。下の候補一覧から選ぶ。"
+      : nWarn > 0 ? "そのまま OK になる組合せは無いが、要確認なら " + nWarn + " 通りある。像円の余裕（下表）を見て判断する。"
+      : noPix === cams.length ? "この視野幅と目標分解能では、どのカメラも画素数が足りない。WD やレンズを変えても解決しない。目標分解能をゆるめるか視野幅を狭める。"
+      : "この WD 範囲で成立する組合せが無い。必要な焦点距離は " + span(nf) + " mm、台帳のレンズは " + span(lf) + " mm。WD 範囲を広げるか、視野幅を見直す。";
+    return { rows, ranked, center, range, need, diag, count: { ok: nOK, warn: nWarn, ng: n(NG) },
+      fail: { pix: noPix, lens: rows.filter(r => r.reason === NO_LENS).length }, needF: nf.length ? span(nf) + " mm" : "－" };
+  }
+
+  // ---- WD／視野幅／分解能 の相互換算（WD⇔視野幅）----
+  // どれを入力にするかで3通り。3つは独立で、同じ答えになるわけではない
+  function convert(inp, v) {
+    const c = inp.cam || {}, l = inp.lens || {};
+    const delta = num(c.px) && num(inp.coc) ? c.px / 1000 * inp.coc : null;
+    const pack = (wd, fovH, res, resIn) => ({
+      wd, fovH, fovV: num(fovH) && num(c.sh) && num(c.sw) && c.sw !== 0 ? fovH * c.sh / c.sw : null, res,
+      dof: num(fovH) ? dof(wd, l.f, delta, inp.fno).total : null,
+      jwd: judgeWD(wd, l.wdmin, l.wdmax), jres: judgeRes(resIn, inp.res),
+    });
+    // ① WD → 視野幅。WD ≦ 焦点距離 では像を結ばないので「－」
+    let a;
+    if (!num(v.wd) || !num(c.sw) || !num(l.f)) a = pack(num(v.wd) ? v.wd : null, null, null, null);
+    else if (v.wd <= l.f) a = pack(v.wd, NA, null, null);
+    else { const fh = c.sw * (v.wd - l.f) / l.f, r = div(fh, c.w); a = pack(v.wd, fh, r, r); }
+    // ② 視野幅 → WD
+    const rb = div(v.fov, c.w), b = pack(wdOf(l.f, v.fov, c.sw), num(v.fov) ? v.fov : null, rb, rb);
+    // ③ 分解能 → 視野幅・WD
+    const fh3 = num(v.res) && num(c.w) ? v.res * c.w : null;
+    const d = pack(wdOf(l.f, fh3, c.sw), fh3, num(v.res) ? v.res : null, num(v.res) ? v.res : null);
+    return { byWD: a, byFov: b, byRes: d };
+  }
+
+  return { OK, WARN, NG, NA, INF, NO_PIX, NO_LENS, num, prep, judgeIC, judgeMount, judgeWD, judgePix, judgeRes,
+    wdOf, dof, evaluate, findLenses, findCameras, findByWD, convert };
+})();
+if (typeof globalThis !== "undefined") globalThis.Calc = Calc;
+
+(() => {
+"use strict";
+const { OK, WARN, NG, NA, num } = Calc;
+Calc.prep(DATA.cams, DATA.lenses, DATA.formats);
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+// ---- 状態（端末内に保存）。初期値はExcel版と同じ ----
+const DEF = { cam: "a2A2440-98g5cBAS", lens: "SV-1214H", fov: 100, fno: 8, coc: 1, res: 0.05, speed: 15, tol: DATA.tol,
+  wdMin: 200, wdMax: 400, cvWd: 300, cvFov: 100, cvRes: 0.05, tab: "sel", findMode: "lens", dbMode: "cam" };
+const KEY = "optics.v1";
+let S = Object.assign({}, DEF);
+try { Object.assign(S, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch (e) { }
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } };
+const U = { findFilter: "cand", findLimit: 8, wdFilter: "cand", wdLimit: 8, dbQ: "", dbChip: "", dbLimit: 20, pick: null };
+const cam = () => DATA.cams.find(c => c.m === S.cam) || null;
+const lens = () => DATA.lenses.find(l => l.m === S.lens) || null;
+const inp = () => ({ cam: cam(), lens: lens(), fov: S.fov, fno: S.fno, coc: S.coc, res: S.res, speed: S.speed, tol: S.tol });
+
+// ---- 表示の整形 ----
+const fmt = (x, d) => (x === "∞" || x === NA ? x : num(x) ? x.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d }) : "－");
+const sgn = (x, d) => (num(x) ? (x < 0 ? "−" : "+") + fmt(Math.abs(x), d) : "－");
+const cls = j => (j === OK ? "ok" : j === WARN ? "warn" : j === NG ? "ng" : "na");
+const badge = j => `<span class="bd ${cls(j)}">${j}</span>`;
+const kv = (k, v, u) => `<div class="kv"><span class="k">${k}</span><span class="v">${v}${u && v !== "－" ? `<small>${u}</small>` : ""}</span></div>`;
+const camSub = c => `${fmt(c.w, 0)}×${fmt(c.h, 0)}・${esc(c.fmt)}型・${esc(c.iface)}・${esc(c.color)}`;
+const lensSub = l => `f ${l.f} mm・${esc(l.fmt)}型・${l.fopen != null ? "F" + l.fopen : "開放F値 未確認"}・${esc(l.mount)}マウント`;
+const icNote = ic => (num(ic.margin) ? `像円の余裕 ${sgn(ic.margin, 2)} mm（${sgn(ic.pct * 100, 1)}%）` : "");
+function wdNote(j, l) {
+  if (j.j === WARN) return "レンズの最短WDが未記入";
+  if (j.kind === "short") return `最短WDに ${fmt(-j.d, 1)} mm 不足`;
+  if (j.kind === "over") return `最大WDを ${fmt(j.d, 1)} mm 超過`;
+  if (j.kind === "ok") return `最短WDから ${sgn(j.d, 1)} mm` + (l && num(l.wdmax) ? `・最大WDまで ${sgn(l.wdmax - (j.d + l.wdmin), 1)} mm` : "");
+  return "";
+}
+let toastTimer;
+function toast(t) { const e = $("toast"); e.textContent = t; e.classList.add("on"); clearTimeout(toastTimer); toastTimer = setTimeout(() => e.classList.remove("on"), 1800); }
+
+// ---- 上の帯 ----
+function renderTop() {
+  if (S.tab === "sel") { $("top").innerHTML = "<h1>光学系選定</h1>"; return; }
+  const e = Calc.evaluate(inp());
+  $("top").innerHTML = `<button class="pair" data-act="tab" data-m="sel"><div class="names"><b><span>カメラ</span>${esc(S.cam || "未選択")}</b><b><span>レンズ</span>${esc(S.lens || "未選択")}</b></div>${badge(e.all)}</button>`;
+}
+
+// ---- 選定 ----
+function renderSel() {
+  const c = cam(), l = lens(), e = Calc.evaluate(inp());
+  $("sel-dev").innerHTML =
+    `<button class="dev${c ? "" : " empty"}" data-act="pick" data-m="cam"><span class="k">カメラ</span><span class="v"><b>${c ? esc(c.m) : "選んでください"}</b>${c ? `<small>${camSub(c)}</small>` : ""}</span><span class="ch">›</span></button>` +
+    `<button class="dev${l ? "" : " empty"}" data-act="pick" data-m="lens"><span class="k">レンズ</span><span class="v"><b>${l ? esc(l.m) : "選んでください"}</b>${l ? `<small>${lensSub(l)}</small>` : ""}</span><span class="ch">›</span></button>`;
+  const mountNote = e.mount.j === OK ? esc(c.mount) + "マウント" : e.mount.j === NG ? `${esc(c.mount)} ↔ ${esc(l.mount)}` : "";
+  const trouble = [e.ic.j, e.mount.j, e.jwd.j, e.pix.j].some(j => j === WARN || j === NG);
+  let h = `<div class="card"><h2>判定${badge(e.all)}</h2>
+    <div class="jrow"><span class="n">イメージサークル</span>${badge(e.ic.j)}<span class="m">${num(e.ic.margin) ? `${sgn(e.ic.margin, 2)} mm（${sgn(e.ic.pct * 100, 1)}%）` : ""}</span></div>
+    <div class="jrow"><span class="n">マウント</span>${badge(e.mount.j)}<span class="m">${mountNote}</span></div>
+    <div class="jrow"><span class="n">WD範囲</span>${badge(e.jwd.j)}<span class="m">${l ? wdNote(e.jwd, l) : ""}</span></div>
+    <div class="jrow"><span class="n">画素数</span>${badge(e.pix.j)}<span class="m">${num(e.pix.margin) ? sgn(e.pix.margin, 0) + " pix" : ""}</span></div>
+    ${trouble ? `<div class="acts"><button class="btn fill" data-act="gofind" data-m="lens">OKになるレンズを探す</button><button class="btn" data-act="gofind" data-m="cam">カメラを探す</button></div>` : ""}
+    <p class="note">右の数字は余裕。マイナスが不足を表します。像円は許容率 ${fmt(S.tol * 100, 1)}% まで超えたら「要確認」。</p></div>`;
+  h += `<div class="hero"><div class="stat"><span class="l">WD（作動距離）</span><b>${fmt(e.wd, 1)}</b><span class="u">mm</span></div>
+    <div class="stat"><span class="l">分解能</span><b>${fmt(e.res, 4)}</b><span class="u">mm/pix</span></div>
+    <div class="stat"><span class="l">被写界深度</span><b>${fmt(e.dofTotal, 2)}</b><span class="u">mm</span></div></div>`;
+  h += `<div class="card"><h2>光学計算</h2>${kv("視野幅（横×縦）", `${fmt(e.fovH, 1)} × ${fmt(e.fovV, 1)}`, "mm")}${kv("必要倍率", fmt(e.mag, 4), "倍")}
+    ${kv("ケラレない最大視野（横）", fmt(e.maxFov, 1), "mm")}${kv("必要画素数（横）", fmt(e.needPix, 0), "pix")}</div>`;
+  h += `<div class="card"><h2>被写界深度</h2>${kv("許容錯乱円 δ", fmt(e.delta, 4), "mm")}${kv("過焦点距離", fmt(e.hyper, 1), "mm")}
+    ${kv("前方", fmt(e.dofFront, 2), "mm")}${kv("後方", fmt(e.dofRear, 2), "mm")}${kv("合計", fmt(e.dofTotal, 2), "mm")}<p class="note">過焦点距離を超えると後方は∞になります。</p></div>`;
+  h += `<div class="card"><h2>搬送・露光</h2>${kv("搬送速度", fmt(e.speed, 1), "mm/sec")}${kv("1画素ぶん動く時間", fmt(e.tpixUs, 0), "µsec")}${kv("", fmt(e.tpixMs, 3), "msec")}
+    <p class="note">ブレを1画素以内に収めるための最大露光時間の目安。これより長く露光すると、搬送方向に像が流れます。</p></div>`;
+  if (c) h += `<details class="card"><summary>カメラ諸元</summary>${camDetail(c)}</details>`;
+  if (l) h += `<details class="card"><summary>レンズ諸元</summary>${lensDetail(l)}</details>`;
+  $("sel-out").innerHTML = h;
+}
+const link = u => (u ? `<a href="${esc(u)}" target="_blank" rel="noopener">開く</a>` : "－");
+function camDetail(c) {
+  return kv("メーカー", esc(c.maker)) + kv("シリーズ", esc(c.series)) + kv("センサ", esc(c.sensor)) + kv("画素数", `${fmt(c.w, 0)} × ${fmt(c.h, 0)}`, "pix") + kv("画素サイズ", fmt(c.px, 2), "µm")
+    + kv("センサ形式", esc(c.fmt), "型") + kv("センサ対角", fmt(c.diag, 2), "mm") + kv("センサ幅×高", `${fmt(c.sw, 2)} × ${fmt(c.sh, 2)}`, "mm") + kv("シャッター", esc(c.shutter))
+    + kv("最大fps", fmt(c.fps, 1), "fps") + kv("カラー/モノクロ", esc(c.color)) + kv("マウント", esc(c.mount)) + kv("インターフェース", esc(c.iface))
+    + (c.memo ? kv("備考", esc(c.memo)) : "") + kv("出典", link(c.url));
+}
+function lensDetail(l) {
+  return kv("メーカー", esc(l.maker)) + kv("シリーズ", esc(l.series)) + kv("焦点距離", String(l.f), "mm") + kv("対応フォーマット", esc(l.fmt), "型") + kv("イメージサークル", fmt(l.ic, 1), "mm")
+    + kv("開放F値", l.fopen != null ? fmt(l.fopen, 2) : "未確認") + kv("最小F値", l.fmin != null ? fmt(l.fmin, 1) : "非公表")
+    + (l.feff ? kv("実効F値（開放時）", esc(l.feff)) : "") + kv("マウント", esc(l.mount)) + kv("最短WD", fmt(l.wdmin, 1), "mm") + kv("最大WD", num(l.wdmax) ? fmt(l.wdmax, 1) : esc(l.wdmax || "－"), num(l.wdmax) ? "mm" : "")
+    + (l.memo ? kv("備考", esc(l.memo)) : "") + kv("出典", `${link(l.url)}<small>${esc(l.kind)}</small>`);
+}
+
+// ---- 候補（カメラかレンズを固定して、もう片方を総当たり）----
+function chipRow(act, cur, defs) { return `<div class="chips">${defs.map(([k, t]) => `<button class="chip${cur === k ? " on" : ""}" data-act="${act}" data-m="${k}">${t}</button>`).join("")}</div>`; }
+function pickRows(r, filter) { return filter === "cand" ? r.ranked : r.rows.filter(x => x.all === (filter === "ok" ? OK : filter === "warn" ? WARN : NG)); }
+function renderFind() {
+  for (const b of $("find-seg").children) b.classList.toggle("on", b.dataset.m === S.findMode);
+  const I = inp(), lensMode = S.findMode === "lens";
+  const r = lensMode ? Calc.findLenses(I, DATA.lenses) : Calc.findCameras(I, DATA.cams), unit = lensMode ? "本" : "台";
+  const fixed = lensMode ? `カメラ <b>${esc(S.cam || "未選択")}</b>` : `レンズ <b>${esc(S.lens || "未選択")}</b>`;
+  let h = `<p class="lead">${fixed} に固定。視野幅 ${fmt(S.fov, 1)} mm・目標分解能 ${fmt(S.res, 3)} mm/pix で、${lensMode ? "レンズ" : "カメラ"}台帳の全機種を評価しています。</p>`;
+  h += `<div class="diag">${esc(r.diag)}</div>`;
+  h += chipRow("findfilter", U.findFilter, [["cand", "良い順"], ["ok", `● OK ${r.count.ok}${unit}`], ["warn", `▲ 要確認 ${r.count.warn}${unit}`], ["ng", `✕ NG ${r.count.ng}${unit}`]]);
+  const f = r.fail;
+  h += `<p class="lead">✕で落ちる数：像円 ${f.ic}・マウント ${f.mount}・WD範囲 ${f.wd}` + (lensMode ? `　／　画素数の判定は ${r.pix.j}（全レンズ共通）` : `・画素数 ${f.pix}`) + "</p>";
+  const rows = pickRows(r, U.findFilter);
+  const list = lensMode ? rows.map(x => [x]) : group(rows, x => [x.ord, x.cam.w, x.cam.h, x.cam.px, x.cam.diag, x.cam.mount].join("|"));
+  h += list.slice(0, U.findLimit).map(g => (lensMode ? lensItem(g[0], I) : camItem(g, I))).join("") || `<div class="empty">該当なし</div>`;
+  if (list.length > U.findLimit) h += `<button class="more" data-act="findmore">さらに表示（残り ${list.length - U.findLimit}${lensMode ? "本" : "組"}）</button>`;
+  $("find-out").innerHTML = h;
+}
+function fails(x, c, l) {
+  const a = [];
+  if (x.ic.j === NG) a.push(`像円が ${fmt(-x.ic.margin, 2)} mm 足りない`);
+  if (x.mount.j === NG) a.push(`マウント違い（${esc(c.mount)} ↔ ${esc(l.mount)}）`);
+  if (x.jwd.j === NG) a.push(wdNote(x.jwd, l));
+  if (x.pix && x.pix.j === NG) a.push(`画素数が ${fmt(-x.pix.margin, 0)} pix 足りない`);
+  return a.length ? `<div class="isub bad">${a.join("／")}</div>` : "";
+}
+const useBtn = (cur, act, m, extra) => (cur ? `<span class="tag">選択中</span>` : `<button class="mini" data-act="${act}" data-m="${esc(m)}"${extra || ""}>採用</button>`);
+function lensItem(x, I) {
+  const l = x.lens, cur = S.lens === l.m;
+  return `<div class="item${cur ? " cur" : ""}"><div class="ih">${badge(x.all)}<b class="mdl">${esc(l.m)}</b>${useBtn(cur, "uselens", l.m)}</div>
+    <div class="isub">${lensSub(l)}</div><div class="isub">算出WD <b>${fmt(x.wd, 1)}</b> mm${x.jwd.j === OK || x.jwd.j === WARN ? "（" + wdNote(x.jwd, l) + "）" : ""}</div>
+    ${x.ic.j !== NG && num(x.ic.margin) ? `<div class="isub">${icNote(x.ic)}</div>` : ""}${fails(x, I.cam || {}, l)}</div>`;
+}
+// 並びが隣どうしで結果が同じもの（センサが同じ別型式）を1組にまとめる
+function group(rows, key) {
+  const out = []; let last;
+  for (const x of rows) { const k = key(x); if (k !== null && k === last) out[out.length - 1].push(x); else out.push([x]); last = k; }
+  return out;
+}
+const variants = (g, act, isCur, extra) => (g.length < 2 ? "" : `<div class="vars">同じセンサの別型式` + g.slice(1).map(v =>
+  `<button class="vchip${isCur(v) ? " on" : ""}" data-act="${act}" data-m="${esc(v.cam.m)}"${extra ? extra(v) : ""}>${esc(v.cam.m)}</button>`).join("") + "</div>");
+function camItem(g, I) {
+  const x = g[0], c = x.cam, cur = S.cam === c.m, l = I.lens || {};
+  return `<div class="item${g.some(v => S.cam === v.cam.m) ? " cur" : ""}"><div class="ih">${badge(x.all)}<b class="mdl">${esc(c.m)}</b>${useBtn(cur, "usecam", c.m)}</div>
+    <div class="isub">${esc(c.sensor)}・${camSub(c)}</div><div class="isub">分解能 <b>${fmt(x.res, 4)}</b> mm/pix・算出WD <b>${fmt(x.wd, 1)}</b> mm</div>
+    ${x.ic.j !== NG && num(x.ic.margin) ? `<div class="isub">${icNote(x.ic)}・画素数の余裕 ${sgn(x.pix.margin, 0)} pix</div>` : ""}${fails(x, c, l)}${variants(g, "usecam", v => S.cam === v.cam.m)}</div>`;
+}
+
+// ---- WDから（取付距離の範囲から カメラ×レンズ を探す）----
+function renderWD() {
+  const r = Calc.findByWD(inp(), DATA.cams, DATA.lenses, S.wdMin, S.wdMax);
+  let h = `<div class="diag">${esc(r.diag)}</div>`;
+  h += `<p class="lead">探索範囲 ${esc(r.range)}・探索の中心 ${fmt(r.center, 1)} mm（ここに近い順に並べます）。視野幅 ${fmt(S.fov, 1)} mm・必要画素数 ${fmt(r.need, 0)} pix。</p>`;
+  h += chipRow("wdfilter", U.wdFilter, [["cand", "良い順"], ["ok", `● OK ${r.count.ok}台`], ["warn", `▲ 要確認 ${r.count.warn}台`], ["ng", `✕ NG ${r.count.ng}台`]]);
+  h += `<p class="lead">✕の理由：画素数が足りない ${r.fail.pix}台・合う焦点距離が無い ${r.fail.lens}台　／　必要な焦点距離 ${esc(r.needF)}</p>`;
+  const list = group(pickRows(r, U.wdFilter), x => (x.lens ? x.lens.m + "|" + x.score : [x.reason, x.cam.w, x.cam.px, x.cam.diag, x.cam.mount].join("|")));
+  h += list.slice(0, U.wdLimit).map(g => {
+    const x = g[0], c = x.cam, l = x.lens, isCur = v => !!l && S.cam === v.cam.m && S.lens === l.m, cur = isCur(x);
+    return `<div class="item${g.some(isCur) ? " cur" : ""}"><div class="ih">${badge(x.all)}<b class="mdl">${esc(c.m)}</b>${l ? useBtn(cur, "usepair", c.m, ` data-l="${esc(l.m)}"`) : ""}</div>
+      ${l ? `<div class="isub">× <b>${esc(l.m)}</b>（f ${l.f} mm、ほかに候補 ${x.count - 1} 本）</div>
+      <div class="isub">算出WD <b>${fmt(x.wd, 1)}</b> mm${num(x.wdMargin) ? `（範囲の端まで ${sgn(x.wdMargin, 1)} mm）` : ""}・分解能 <b>${fmt(x.res, 4)}</b> mm/pix</div>
+      <div class="isub">像円の余裕 ${sgn(x.icMargin, 2)} mm・ちょうど中心に来る焦点距離 ${fmt(x.needF, 2)} mm</div>`
+      : `<div class="isub">${camSub(c)}</div><div class="isub bad">${esc(x.reason)}${num(x.needF) ? `（ちょうど中心に来る焦点距離 ${fmt(x.needF, 2)} mm）` : ""}</div>`}${
+      l ? variants(g, "usepair", isCur, () => ` data-l="${esc(l.m)}"`) : g.length > 1 ? `<div class="isub">同じセンサの別型式 ${g.length - 1} 機種も同じ結果</div>` : ""}</div>`;
+  }).join("") || `<div class="empty">該当なし</div>`;
+  if (list.length > U.wdLimit) h += `<button class="more" data-act="wdmore">さらに表示（残り ${list.length - U.wdLimit}組）</button>`;
+  h += `<p class="note">1台のカメラにつき、いちばん合うレンズ1本を出しています。センサが同じ別型式（カラー/モノクロ・インターフェース違い）は1枚にまとめています。算出WDはレンズ主点から被写体までの距離。カタログの最短/最大WDはレンズ先端からのことが多く、その差（レンズ全長ぶん）までは見ていません。取付は余裕を持たせてください。</p>`;
+  $("wd-out").innerHTML = h;
+}
+
+// ---- 換算（WD⇔視野幅）----
+function renderCv() {
+  const I = inp(), e = Calc.evaluate(I), r = Calc.convert(I, { wd: S.cvWd, fov: S.cvFov, res: S.cvRes }), l = I.lens;
+  $("cv-head").innerHTML = `<div class="card"><h2>この組合せで決まる判定</h2><div class="jrow"><span class="n">イメージサークル</span>${badge(e.ic.j)}<span class="m">${num(e.ic.margin) ? sgn(e.ic.margin, 2) + " mm" : ""}</span></div>
+    <div class="jrow"><span class="n">マウント</span>${badge(e.mount.j)}<span class="m"></span></div><p class="note">この2つは組合せだけで決まり、WDや視野幅を変えても動きません。</p></div>`;
+  const judge = x => `<div class="jrow"><span class="n">WD範囲</span>${badge(x.jwd.j)}<span class="m">${l ? wdNote(x.jwd, l) : ""}</span></div>
+    <div class="jrow"><span class="n">分解能</span>${badge(x.jres.j)}<span class="m">${num(x.jres.margin) ? "目標との差 " + sgn(x.jres.margin, 3) : ""}</span></div>`;
+  const fovHV = x => kv("視野幅（横×縦）", x.fovH === NA ? "－（WDが焦点距離以下で像を結ばない）" : `${fmt(x.fovH, 1)} × ${fmt(x.fovV, 1)}`, x.fovH === NA ? "" : "mm");
+  $("cv-a").innerHTML = fovHV(r.byWD) + kv("分解能", fmt(r.byWD.res, 4), "mm/pix") + kv("被写界深度", fmt(r.byWD.dof, 2), "mm") + judge(r.byWD);
+  $("cv-b").innerHTML = kv("WD", fmt(r.byFov.wd, 1), "mm") + kv("視野幅（縦）", fmt(r.byFov.fovV, 1), "mm") + kv("分解能", fmt(r.byFov.res, 4), "mm/pix") + kv("被写界深度", fmt(r.byFov.dof, 2), "mm") + judge(r.byFov);
+  $("cv-c").innerHTML = fovHV(r.byRes) + kv("WD", fmt(r.byRes.wd, 1), "mm") + kv("被写界深度", fmt(r.byRes.dof, 2), "mm") + judge(r.byRes);
+}
+
+// ---- 台帳の一覧（台帳タブと、機器を選ぶシートで共用）----
+const CAM_CHIPS = [["", "すべて"], ["a2A", "ace 2"], ["acA", "ace"], ["GigE", "GigE"], ["5GigE", "5GigE"], ["USB3", "USB3"], ["カラー", "カラー"], ["モノクロ", "モノクロ"]];
+const LENS_CHIPS = [["", "すべて"]].concat([...new Set(DATA.lenses.map(l => l.series))].map(s => [s, s]));
+function filterItems(kind, q, chip) {
+  const words = q.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  return (kind === "cam" ? DATA.cams : DATA.lenses).filter(x => {
+    if (chip) {
+      if (kind === "lens") { if (x.series !== chip) return false; }
+      else if (!(x.m.startsWith(chip) || x.iface === chip || x.color === chip)) return false;
+    }
+    const hay = (kind === "cam" ? [x.m, x.sensor, x.fmt + "型", x.iface, x.color, x.w + "x" + x.h] : [x.m, x.series, x.fmt + "型", "f" + x.f, x.mount]).join(" ").toLowerCase();
+    return words.every(w => hay.includes(w));
+  });
+}
+function listHTML(kind, act, marks) {
+  const items = filterItems(kind, U.dbQ, U.dbChip), curM = kind === "cam" ? S.cam : S.lens;
+  let h = `<div class="list">` + (items.slice(0, U.dbLimit).map(x => {
+    const j = marks ? marks.get(x.m) : null;
+    return `<button class="row${x.m === curM ? " cur" : ""}" data-act="${act}" data-m="${esc(x.m)}">${marks ? `<span class="dot ${cls(j)}"></span>` : ""}<span class="rv"><b>${esc(x.m)}</b><small>${kind === "cam" ? camSub(x) : lensSub(x)}</small></span></button>`;
+  }).join("") || `<div class="empty">該当なし</div>`) + "</div>";
+  if (items.length > U.dbLimit) h += `<button class="more" style="margin-top:8px" data-act="dbmore">さらに表示（残り ${items.length - U.dbLimit}件）</button>`;
+  return h;
+}
+const searchBox = ph => `<div class="search"><input id="q" type="search" placeholder="${ph}" value="${esc(U.dbQ)}" autocomplete="off" autocapitalize="off"></div>`;
+function renderDb() {
+  for (const b of $("db-seg").children) b.classList.toggle("on", b.dataset.m === S.dbMode);
+  if (S.dbMode === "etc") { renderEtc(); return; }
+  const kind = S.dbMode;
+  if (!$("db-list") || $("db-out").dataset.kind !== kind) {
+    $("db-out").dataset.kind = kind;
+    $("db-out").innerHTML = searchBox(kind === "cam" ? "型式・センサ・型で絞り込み（例: 2448 gige）" : "型式・焦点距離で絞り込み（例: f25）") + `<div id="db-chips"></div><div id="db-list"></div>`;
+  }
+  $("db-chips").innerHTML = chipRow("dbchip", U.dbChip, kind === "cam" ? CAM_CHIPS : LENS_CHIPS);
+  $("db-list").innerHTML = `<p class="lead">${kind === "cam" ? "カメラ" : "レンズ"} ${filterItems(kind, U.dbQ, U.dbChip).length}機種。タップで諸元を表示します。</p>` + listHTML(kind, "detail");
+}
+function renderEtc() {
+  $("db-out").dataset.kind = "etc";
+  const unknownF = DATA.lenses.filter(l => l.fopen == null).length;
+  $("db-out").innerHTML = `<div class="card"><h2>像円の許容率</h2><div class="field"><div class="box"><input id="i-tol" data-k="tolPct" inputmode="decimal" autocomplete="off" value="${fmt(S.tol * 100, 1)}"><span class="u">%</span></div></div>
+    <p class="note">センサ対角が像円をこの割合まで超えていたら「要確認」、それ以上なら「NG」。2/3型センサの実対角は11.1mmで、2/3型レンズの像円11.0mmをわずかに超えます。0%にするとこうした正しい組合せまでNGになり、大きくしすぎると本当にケラレる組合せを通してしまいます（既定 ${fmt(DATA.tol * 100, 1)}%）。</p></div>
+    <div class="card"><h2>センサ形式（型）→ イメージサークル</h2><div class="fmt">${DATA.formats.map(f => kv(esc(f[0]) + "型", fmt(f[1], 1), "mm")).join("")}</div>
+    <p class="note">レンズの「対応フォーマット（型）」から像円を引くための慣用値。カメラ側は各データシートの実対角を使います。</p></div>
+    <div class="card"><h2>このアプリについて</h2>${kv("カメラ", DATA.cams.length + " 機種", "Basler ace 2 / ace")}${kv("レンズ", DATA.lenses.length + " 機種", "VSテクノロジー")}${kv("台帳の確認日", esc(DATA.date))}
+    <p class="note">諸元はメーカー・代理店の公開仕様から採ったものです。開放F値が未確認のレンズが ${unknownF} 機種あり、空欄のままにしてあります。選定の最終確認は必ずメーカーの最新資料で行ってください。入力した条件はこの端末の中にだけ保存されます。</p>
+    <div class="acts"><button class="btn" data-act="reset">条件を初期値に戻す</button></div></div>`;
+}
+
+// ---- シート（機器を選ぶ／諸元を見る）----
+function openSheet(title, html) { $("sheet-title").textContent = title; $("sheet-body").innerHTML = html; $("sheet").classList.add("on"); document.body.classList.add("lock"); $("sheet-body").scrollTop = 0; }
+function closeSheet() { $("sheet").classList.remove("on"); document.body.classList.remove("lock"); U.pick = null; }
+// 選ぶ一覧には、いまの相手と条件での判定を色の点で出す（選ぶ前に使えるか分かる）
+function pickMarks(kind) {
+  const I = inp(), r = kind === "lens" ? Calc.findLenses(I, DATA.lenses) : Calc.findCameras(I, DATA.cams);
+  return new Map(r.rows.map(x => [(x.lens || x.cam).m, x.all]));
+}
+function openPicker(kind) {
+  U.pick = kind; U.dbQ = ""; U.dbChip = ""; U.dbLimit = 30;
+  openSheet(kind === "cam" ? "カメラを選ぶ" : "レンズを選ぶ", searchBox("型式などで絞り込み") + `<div id="pk-chips"></div><p class="lead">点の色は、いまの${kind === "cam" ? "レンズ" : "カメラ"}と条件での判定（緑 OK／黄 要確認／赤 NG）。</p><div id="pk-list"></div>`);
+  renderPicker();
+}
+function renderPicker() {
+  const kind = U.pick;
+  $("pk-chips").innerHTML = chipRow("dbchip", U.dbChip, kind === "cam" ? CAM_CHIPS : LENS_CHIPS);
+  $("pk-list").innerHTML = listHTML(kind, kind === "cam" ? "usecam" : "uselens", pickMarks(kind));
+}
+function openDetail(kind, m) {
+  const x = (kind === "cam" ? DATA.cams : DATA.lenses).find(v => v.m === m); if (!x) return;
+  openSheet(x.m, `<div class="card">${kind === "cam" ? camDetail(x) : lensDetail(x)}</div><button class="btn fill" style="width:100%" data-act="${kind === "cam" ? "usecam" : "uselens"}" data-m="${esc(m)}">この${kind === "cam" ? "カメラ" : "レンズ"}で選定する</button>`);
+}
+
+// ---- 入力と操作 ----
+const FIELDS = { "i-fov": "fov", "i-res": "res", "i-fno": "fno", "i-coc": "coc", "i-speed": "speed", "i-wdmin": "wdMin", "i-wdmax": "wdMax", "i-cvwd": "cvWd", "i-cvfov": "cvFov", "i-cvres": "cvRes" };
+function parse(t) {
+  t = String(t).replace(/[０-９．]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0)).replace(/[,\s]/g, "");
+  if (t === "") return null;
+  const v = Number(t); return isFinite(v) ? v : null;
+}
+function fillInputs() { for (const [id, k] of Object.entries(FIELDS)) $(id).value = S[k] == null ? "" : S[k]; }
+const RENDER = { sel: renderSel, find: renderFind, wd: renderWD, cv: renderCv, db: renderDb };
+function render() {
+  for (const t of Object.keys(RENDER)) $("t-" + t).classList.toggle("on", t === S.tab);
+  for (const b of $("tabs").children) b.classList.toggle("on", b.dataset.m === S.tab);
+  renderTop(); RENDER[S.tab]();
+}
+function go(tab) { S.tab = tab; save(); render(); window.scrollTo(0, 0); }
+document.addEventListener("input", ev => {
+  const t = ev.target;
+  if (t.id === "q") { U.dbQ = t.value; U.dbLimit = U.pick ? 30 : 20; U.pick ? renderPicker() : renderDb(); return; }
+  const k = t.dataset && t.dataset.k; if (!k) return;
+  const v = parse(t.value);
+  if (k === "tolPct") { S.tol = v !== null && v >= 0 ? v / 100 : DATA.tol; save(); return; }
+  S[k] = v; save(); renderTop(); RENDER[S.tab]();
+});
+document.addEventListener("click", ev => {
+  const b = ev.target.closest("[data-act]"); if (!b) return;
+  const a = b.dataset.act, m = b.dataset.m;
+  if (a === "tab") { if (m === "db") { U.dbQ = ""; U.dbChip = ""; U.dbLimit = 20; $("db-out").dataset.kind = ""; } go(m); }
+  else if (a === "pick") openPicker(m);
+  else if (a === "close") closeSheet();
+  else if (a === "gofind") { S.findMode = m; U.findFilter = "cand"; U.findLimit = 8; go("find"); }
+  else if (a === "findmode") { S.findMode = m; U.findFilter = "cand"; U.findLimit = 8; save(); renderFind(); }
+  else if (a === "findfilter") { U.findFilter = m; U.findLimit = 8; renderFind(); }
+  else if (a === "findmore") { U.findLimit += 8; renderFind(); }
+  else if (a === "wdfilter") { U.wdFilter = m; U.wdLimit = 8; renderWD(); }
+  else if (a === "wdmore") { U.wdLimit += 8; renderWD(); }
+  else if (a === "dbmode") { S.dbMode = m; U.dbQ = ""; U.dbChip = ""; U.dbLimit = 20; save(); renderDb(); }
+  else if (a === "dbchip") { U.dbChip = m; U.dbLimit = U.pick ? 30 : 20; U.pick ? renderPicker() : renderDb(); }
+  else if (a === "dbmore") { U.dbLimit += 30; U.pick ? renderPicker() : renderDb(); }
+  else if (a === "detail") openDetail(S.dbMode, m);
+  else if (a === "usecam" || a === "uselens" || a === "usepair") {
+    if (a !== "uselens") S.cam = m;
+    if (a === "uselens") S.lens = m;
+    if (a === "usepair") S.lens = b.dataset.l;
+    closeSheet(); toast(a === "usepair" ? "この組合せにしました" : (a === "usecam" ? "カメラ" : "レンズ") + "を " + m + " にしました"); go("sel");
+  }
+  else if (a === "reset") { if (confirm("カメラ・レンズ・条件を初期値に戻します。よろしいですか？")) { S = Object.assign({}, DEF, { tab: "sel" }); save(); fillInputs(); go("sel"); toast("初期値に戻しました"); } }
+});
+if (!RENDER[S.tab]) S.tab = "sel";
+fillInputs(); render();
+})();
+</script>
+<script>if('serviceWorker' in navigator && location.protocol.startsWith('http')){var hadSW=!!navigator.serviceWorker.controller,reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',function(){if(hadSW&&!reloaded){reloaded=true;location.reload();}});navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
+</body>
+</html>
